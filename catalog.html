@@ -2,242 +2,323 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Findest Sport — Catalog</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Findest Sport — Premium Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <style>
-:root{--bg:#080B0F;--surface:#0F1419;--surface2:#161D26;--border:#1E2D3D;--teal:#00D4B1;--teal-dim:rgba(0,212,177,.12);--gold:#F5A623;--red:#FF3B5C;--text:#EFF6FF;--muted:#607898;--dim:#2A3D52}
+:root{
+  --bg:#050810;
+  --bg2:#080d18;
+  --surface:#0c1220;
+  --surface2:#111827;
+  --border:#1a2540;
+  --teal:#00D4B1;
+  --teal2:#00ff88;
+  --teal-dim:rgba(0,212,177,.1);
+  --gold:#F5A623;
+  --red:#FF3B5C;
+  --blue:#4169E1;
+  --text:#EFF6FF;
+  --muted:#4a6080;
+  --dim:#1a2a40;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-.loading-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s}
-.loading-screen.hidden{opacity:0;pointer-events:none}
-.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--teal);letter-spacing:4px}
-.loading-sub{font-size:12px;color:var(--muted);letter-spacing:2px}
-.loading-bar{width:200px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:8px}
-.loading-bar-fill{height:100%;background:var(--teal);border-radius:2px;animation:loadbar 1.5s ease-in-out infinite}
-@keyframes loadbar{0%{width:0%}50%{width:70%}100%{width:100%}}
-.hero{position:relative;padding:48px 20px 32px;background:linear-gradient(160deg,#0a1525 0%,#080B0F 60%);overflow:hidden}
-.hero::before{content:'';position:absolute;top:-80px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(0,212,177,.15) 0%,transparent 70%);pointer-events:none}
-.hero-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
-.hero-logo-icon{width:44px;height:44px;background:var(--teal);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#080B0F;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
-.hero-logo-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--teal)}
-.hero-logo-sub{font-size:11px;color:var(--muted)}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,10vw,72px);line-height:.95;letter-spacing:2px;margin-bottom:12px}
-.hero-title span{color:var(--teal)}
-.hero-desc{font-size:14px;color:var(--muted);line-height:1.6;max-width:320px;margin-bottom:24px}
-.hero-badges{display:flex;gap:8px;flex-wrap:wrap}
-.badge-pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;letter-spacing:.3px}
-.badge-pill.teal{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
-.badge-pill.gold{border-color:var(--gold);color:var(--gold);background:rgba(245,166,35,.1)}
-.search-wrap{padding:12px 16px;position:sticky;top:0;z-index:100;background:rgba(8,11,15,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-.search-box{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 16px}
-.search-box input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif}
-.search-box input::placeholder{color:var(--muted)}
-.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none}
-.cat-scroll::-webkit-scrollbar{display:none}
-.cat-btn{flex-shrink:0;padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.cat-btn.active{background:var(--teal);border-color:var(--teal);color:#080B0F}
-.section-label{padding:16px 16px 2px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--muted)}
-.section-count{font-size:11px;color:var(--muted);padding:0 16px 10px}
-.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 12px 120px}
-@media(min-width:480px){.product-grid{grid-template-columns:repeat(3,1fr)}}
-.product-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .2s,box-shadow .2s;position:relative;animation:fadeUp .4s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.product-card:active{transform:scale(.96)}
-.product-card.in-cart{border-color:var(--teal);box-shadow:0 0 16px rgba(0,212,177,.15)}
-.card-img-wrap{position:relative;padding-top:100%;background:var(--surface2);overflow:hidden}
-.card-img{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px}
-.card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.card-badge-brand{position:absolute;top:7px;left:7px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.5px}
-.brand-ON{background:#C8960C;color:#fff}
-.brand-BSN{background:#1565C0;color:#fff}
-.brand-ISOPURE{background:#2E7D32;color:#fff}
-.card-video{position:absolute;top:7px;right:7px;background:rgba(255,59,92,.85);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
-.card-qty-badge{position:absolute;bottom:7px;right:7px;background:var(--teal);color:#080B0F;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.card-body{padding:9px 10px 11px}
-.card-name{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-variant{font-size:9px;color:var(--muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-price{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--teal)}
-.card-price-zero{font-size:10px;color:var(--muted);font-family:'DM Sans',sans-serif;margin-top:2px}
-.card-add-btn{width:100%;margin-top:7px;padding:6px;border-radius:7px;border:1px solid var(--teal);background:var(--teal-dim);color:var(--teal);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
-.card-add-btn.added{background:var(--teal);color:#080B0F}
-.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:none;align-items:flex-end}
-.modal-overlay.open{display:flex}
-.modal-sheet{width:100%;max-height:90vh;background:var(--surface);border-radius:22px 22px 0 0;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
-.modal-overlay.open .modal-sheet{transform:translateY(0)}
-.modal-drag{width:36px;height:4px;background:var(--dim);border-radius:2px;margin:12px auto 0}
-.modal-img{width:100%;height:220px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:88px;position:relative;overflow:hidden}
-.modal-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.modal-body{padding:18px 18px 32px}
-.modal-brand-tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.5px;margin-bottom:8px}
-.modal-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1.1;margin-bottom:5px}
-.modal-variant{font-size:12px;color:var(--muted);margin-bottom:12px}
-.modal-price{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;color:var(--teal);margin-bottom:14px}
-.modal-price span{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted)}
-.modal-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;padding:12px;background:var(--surface2);border-radius:9px}
-.modal-video-btn{display:flex;align-items:center;gap:8px;padding:11px 14px;background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3);border-radius:9px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px;transition:all .2s}
-.qty-control{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.qty-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.qty-btn:active{transform:scale(.88)}
-.qty-num{font-size:20px;font-weight:700;min-width:28px;text-align:center}
-.add-to-cart-btn{width:100%;padding:15px;border-radius:13px;border:none;background:var(--teal);color:#080B0F;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.add-to-cart-btn:active{transform:scale(.98)}
-.cart-fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:150;display:flex;align-items:center;gap:10px;background:var(--teal);color:#080B0F;padding:13px 22px;border-radius:50px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 8px 28px rgba(0,212,177,.35);transition:transform .2s,opacity .3s;white-space:nowrap;min-width:190px;justify-content:space-between;border:none}
-.cart-fab.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(80px)}
-.cart-fab:active{transform:translateX(-50%) scale(.97)}
-.cart-fab-count{background:#080B0F;color:var(--teal);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
-.cart-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
-.cart-item-thumb{width:44px;height:44px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden}
-.cart-item-thumb img{width:100%;height:100%;object-fit:cover}
-.cart-item-info{flex:1;min-width:0}
-.cart-item-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cart-item-variant{font-size:10px;color:var(--muted)}
-.cart-item-price{font-size:12px;color:var(--teal);font-weight:700;margin-top:2px}
-.cart-item-qty{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.ci-qty-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.ci-qty-num{font-size:13px;font-weight:700;min-width:18px;text-align:center}
-.order-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:11px 13px;margin-bottom:9px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
-.order-input:focus{border-color:var(--teal)}
-.order-input::placeholder{color:var(--muted)}
-.checkout-btn{width:100%;padding:15px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--teal),#00B894);color:#080B0F;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
-.checkout-btn:active{transform:scale(.98)}
-.cart-total{display:flex;justify-content:space-between;align-items:center;padding:13px 0;font-weight:700;border-top:1px solid var(--border);margin-top:4px}
-.cart-total-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--teal)}
-.video-overlay{position:fixed;inset:0;z-index:500;background:#000;display:none;flex-direction:column}
-.video-overlay.open{display:flex}
-.video-close{position:absolute;top:16px;right:16px;width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:50%;border:none;color:#fff;font-size:18px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center}
-.video-overlay iframe{flex:1;width:100%;border:none}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface);border:1px solid var(--teal);color:var(--text);padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:1000;transition:transform .3s;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.empty-state{text-align:center;padding:50px 20px;color:var(--muted);grid-column:1/-1}
-.no-price{color:var(--muted);font-size:11px;font-family:'DM Sans',sans-serif}
-.stok-badge{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;z-index:3}
-.stok-habis{background:rgba(255,59,92,.9);color:#fff}
-.stok-terbatas{background:rgba(245,166,35,.9);color:#fff}
-.product-card.habis{opacity:.65;cursor:default}
-.product-card.habis .card-img{filter:grayscale(60%)}
-.btn-habis{background:rgba(255,59,92,.15)!important;color:#FF3B5C!important;border:1px solid rgba(255,59,92,.3)!important;cursor:not-allowed!important}
-.btn-habis:hover{transform:none!important;box-shadow:none!important}
-.stok-warning{margin-bottom:10px;padding:9px 12px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:8px;color:#F5A623;font-size:12px}
-.stok-kosong-banner{text-align:center;padding:14px;background:rgba(255,59,92,.08);border:1px solid rgba(255,59,92,.25);border-radius:10px;color:#FF3B5C;font-size:13px;font-weight:600}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
 
-/* ── 3D HERO ENHANCEMENTS ── */
-.hero{position:relative;min-height:320px;overflow:hidden}
-#heroCanvas{position:absolute;top:0;right:0;width:60%;height:100%;pointer-events:none;z-index:0}
-.hero-content-wrap{position:relative;z-index:1}
-.hero-title{overflow:hidden}
-.hero-title .line{display:block;overflow:hidden}
-.hero-title .word{display:inline-block;transform:translateY(100%);opacity:0}
+/* ── LOADING ── */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.loader-logo{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:var(--teal);letter-spacing:6px;text-shadow:0 0 30px rgba(0,212,177,.5)}
+.loader-sub{font-size:11px;color:var(--muted);letter-spacing:4px;font-family:'Orbitron',monospace}
+.loader-ring{width:60px;height:60px;position:relative}
+.loader-ring::before,.loader-ring::after{content:'';position:absolute;border-radius:50%}
+.loader-ring::before{inset:0;border:2px solid var(--border);animation:spin 1.5s linear infinite}
+.loader-ring::after{inset:4px;border:2px solid transparent;border-top-color:var(--teal);border-right-color:var(--teal2);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-pct{font-family:'Orbitron',monospace;font-size:13px;color:var(--teal);letter-spacing:2px}
 
-/* ── PRODUCT SLIDER ── */
-.slider-wrap{position:relative;margin-bottom:8px}
-.slider-track-outer{overflow:hidden;padding:4px 0}
-.slider-track{display:flex;gap:10px;padding:0 12px;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);will-change:transform}
-.slider-track .product-card{flex:0 0 150px;animation:none;opacity:1;transform:none}
-.slider-nav-row{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0}
-.slider-dots{display:flex;gap:5px}
-.sdot{width:5px;height:5px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s}
-.sdot.active{width:18px;border-radius:3px;background:var(--teal)}
-.slider-arrows{display:flex;gap:6px}
-.sarr{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.sarr:hover{background:var(--teal);border-color:var(--teal);color:#080B0F}
+/* ── HERO ── */
+#heroWrap{position:relative;height:100vh;min-height:600px;overflow:hidden}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,8,16,.9) 0%,rgba(5,8,16,.4) 50%,rgba(5,8,16,.7) 100%);z-index:1}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,177,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,177,.03) 1px,transparent 1px);background-size:50px 50px;z-index:1;pointer-events:none}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 20px 40px;z-index:2}
+.hero-eyebrow{font-family:'Orbitron',monospace;font-size:10px;color:var(--teal);letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;opacity:0;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--teal)}
+.hero-title-wrap{overflow:hidden;margin-bottom:8px}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,14vw,100px);line-height:.9;letter-spacing:3px;transform:translateY(110%);opacity:0}
+.hero-title .accent{color:transparent;-webkit-text-stroke:1px var(--teal);text-shadow:none}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:20px;opacity:0;max-width:360px}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;opacity:0}
+.hpill{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;border:1px solid}
+.hpill.g{border-color:var(--teal);color:var(--teal);background:rgba(0,212,177,.08)}
+.hpill.y{border-color:var(--gold);color:var(--gold);background:rgba(245,166,35,.08)}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;background:var(--teal);color:#050810;padding:14px 28px;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;letter-spacing:.5px;opacity:0;transform:translateY(10px);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.hero-cta:active{transform:scale(.97)}
+.hero-scroll{position:absolute;bottom:20px;right:20px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0}
+.hero-scroll span{font-size:9px;color:var(--muted);letter-spacing:2px;writing-mode:vertical-rl;font-family:'Orbitron',monospace}
+.hero-scroll-line{width:1px;height:40px;background:linear-gradient(var(--teal),transparent);animation:scrollLine 1.5s ease-in-out infinite}
+@keyframes scrollLine{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
 /* ── STATS BAR ── */
-.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);margin:0 12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.stat-item{padding:14px 10px;text-align:center;border-right:1px solid var(--border)}
-.stat-item:last-child{border-right:none}
-.stat-num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--teal);letter-spacing:1px}
-.stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.stats-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.stat{padding:16px 10px;text-align:center;border-right:1px solid var(--border);opacity:0;transform:translateY(10px)}
+.stat:last-child{border-right:none}
+.stat-num{font-family:'Orbitron',monospace;font-size:22px;font-weight:700;color:var(--teal)}
+.stat-label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
 
-/* ── SCROLL REVEAL ── */
-.reveal-up{opacity:0;transform:translateY(24px)}
-.reveal-left{opacity:0;transform:translateX(-24px)}
+/* ── NAV / SEARCH ── */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(5,8,16,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.topbar-logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--teal);letter-spacing:2px;flex-shrink:0}
+.search-box{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;transition:border-color .2s}
+.search-box:focus-within{border-color:var(--teal)}
+.search-box input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+.search-box input::placeholder{color:var(--muted)}
+
+/* ── CATEGORY PILLS ── */
+.cat-wrap{display:flex;gap:6px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none;border-bottom:1px solid var(--border)}
+.cat-wrap::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;padding:6px 14px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;letter-spacing:.5px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.cat-btn.active{background:var(--teal);border-color:var(--teal);color:#050810}
+
+/* ── SECTION HEADER ── */
+.sec-header{padding:20px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;color:var(--text);letter-spacing:2px}
+.sec-count{font-size:11px;color:var(--muted);font-family:'Orbitron',monospace}
+
+/* ── FEATURED SLIDER ── */
+.slider-outer{overflow:hidden;padding:4px 0 16px}
+.slider-track{display:flex;gap:10px;padding:0 16px;will-change:transform}
+.slider-nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px 16px}
+.sdots{display:flex;gap:4px}
+.sdot{width:4px;height:4px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s}
+.sdot.active{width:16px;border-radius:2px;background:var(--teal)}
+.sarrows{display:flex;gap:6px}
+.sarr{width:32px;height:32px;border-radius:3px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.sarr:hover{background:var(--teal);color:#050810;border-color:var(--teal)}
+
+/* ── PRODUCT GRID ── */
+.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 10px 120px}
+@media(min-width:480px){.prod-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── PRODUCT CARD ── */
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;position:relative;transition:border-color .2s,transform .15s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.pc:active{transform:scale(.96)}
+.pc.in-cart{border-color:var(--teal)}
+.pc.in-cart::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,177,.05),transparent);pointer-events:none}
+.pc-img{height:110px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;overflow:hidden;background:var(--surface2)}
+.pc-img-bg{position:absolute;inset:0;opacity:.3;background-size:cover;filter:blur(8px)}
+.pc-corner{position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 24px 24px 0;border-color:transparent var(--teal) transparent transparent;opacity:.6}
+.pc-brand{position:absolute;top:7px;left:7px;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:2px;font-family:'Orbitron',monospace}
+.pc-brand.ON{background:rgba(0,212,177,.2);color:var(--teal);border:1px solid rgba(0,212,177,.3)}
+.pc-brand.BSN{background:rgba(65,105,225,.2);color:#6fa0ff;border:1px solid rgba(65,105,225,.3)}
+.pc-brand.ISOPURE{background:rgba(255,59,92,.15);color:#ff7a97;border:1px solid rgba(255,59,92,.3)}
+.pc-stok{position:absolute;top:7px;right:7px}
+.pc-stok.habis{background:rgba(255,59,92,.9);color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:2px;font-family:'Orbitron',monospace}
+.pc-stok.terbatas{background:rgba(245,166,35,.9);color:#050810;font-size:8px;font-weight:700;padding:2px 6px;border-radius:2px;font-family:'Orbitron',monospace}
+.pc-body{padding:10px}
+.pc-name{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:4px;color:var(--text)}
+.pc-kat{font-size:9px;color:var(--muted);letter-spacing:.5px;margin-bottom:6px;font-family:'Orbitron',monospace}
+.pc-price{font-size:13px;font-weight:700;color:var(--teal);font-family:'Orbitron',monospace;margin-bottom:8px}
+.pc-price.no-price{font-size:10px;color:var(--muted)}
+.pc-add{width:100%;padding:7px;background:transparent;border:1px solid var(--teal);color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:1px;transition:all .2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.pc-add:hover,.pc-add.added{background:var(--teal);color:#050810}
+.pc-add:disabled{background:rgba(255,59,92,.1);border-color:rgba(255,59,92,.3);color:var(--red);cursor:not-allowed}
+.pc-add:active{transform:scale(.95)}
+
+/* ── CART FAB ── */
+.cart-fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);z-index:150;display:flex;align-items:center;gap:10px;background:var(--teal);color:#050810;padding:13px 24px;border-radius:3px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;white-space:nowrap;min-width:200px;justify-content:space-between;border:none;font-family:'Inter',sans-serif;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));opacity:0}
+.cart-fab.show{transform:translateX(-50%) translateY(0);opacity:1}
+.cart-fab:active{transform:translateX(-50%) scale(.97)}
+.cart-fab-badge{background:#050810;color:var(--teal);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-family:'Orbitron',monospace}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);position:relative}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.modal-drag{width:36px;height:3px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-body{padding:16px 18px 40px}
+
+/* ── PRODUCT MODAL ── */
+.pm-img{height:200px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:72px;border-radius:12px;margin-bottom:16px;position:relative;overflow:hidden;border:1px solid var(--border)}
+.pm-img img{width:100%;height:100%;object-fit:cover}
+.pm-brand{font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;margin-bottom:6px}
+.pm-name{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.pm-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.pm-price{font-family:'Orbitron',monospace;font-size:24px;font-weight:700;color:var(--teal);margin-bottom:20px}
+.pm-qty{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.qty-btn{width:36px;height:36px;border-radius:3px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+.qty-num{font-size:20px;font-weight:700;font-family:'Orbitron',monospace;color:var(--teal);min-width:28px;text-align:center}
+.pm-add{width:100%;padding:15px;background:var(--teal);color:#050810;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:2px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.pm-add:active{transform:scale(.98)}
+.pm-video{display:flex;align-items:center;gap:8px;padding:10px 0;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:16px}
+
+/* ── CART MODAL ── */
+.ci{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ci-thumb{width:42px;height:42px;border-radius:6px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;border:1px solid var(--border)}
+.ci-thumb img{width:100%;height:100%;object-fit:cover}
+.ci-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-brand{font-size:9px;color:var(--muted);letter-spacing:1px;font-family:'Orbitron',monospace;margin-top:2px}
+.ci-price{font-size:12px;color:var(--teal);font-weight:700;font-family:'Orbitron',monospace;margin-top:2px}
+.ci-qty{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.ciq-btn{width:26px;height:26px;border-radius:3px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ciq-num{font-size:13px;font-weight:700;font-family:'Orbitron',monospace;min-width:20px;text-align:center;color:var(--teal)}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:700;border-top:1px solid var(--border);margin-top:6px}
+.cart-total-val{font-family:'Orbitron',monospace;font-size:20px;color:var(--teal)}
+
+/* ── FORM ── */
+.form-section-title{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;margin:18px 0 10px;color:var(--text)}
+.finput{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:11px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:8px;transition:border-color .2s}
+.finput:focus{border-color:var(--teal)}
+.finput::placeholder{color:var(--muted)}
+textarea.finput{resize:none}
+
+/* ── PAYMENT CARDS ── */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pay-card{border:1px solid var(--border);border-radius:6px;padding:14px;cursor:pointer;transition:all .2s;text-align:center;background:var(--surface);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.pay-card.sel{border-color:var(--teal);background:rgba(0,212,177,.06)}
+.pay-card-icon{font-size:24px;margin-bottom:6px}
+.pay-card-title{font-size:12px;font-weight:700;color:var(--text);font-family:'Orbitron',monospace;letter-spacing:.5px}
+.pay-card-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.pay-info-box{padding:12px;background:var(--surface);border:1px solid var(--teal);border-radius:6px;margin-bottom:10px;display:none}
+.pay-info-box.show{display:block}
+.pay-badge{padding:8px 12px;background:rgba(0,212,177,.1);border:1px solid var(--teal);border-radius:4px;font-size:12px;color:var(--teal);font-weight:600;margin-bottom:10px;display:none}
+.pay-badge.show{display:block}
+
+/* ── CHECKOUT BTN ── */
+.checkout-btn{width:100%;margin-top:12px;padding:15px;background:var(--teal);color:#050810;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:2px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.checkout-btn:active{transform:scale(.98)}
+.checkout-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+
+/* ── VIDEO OVERLAY ── */
+.video-ov{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column}
+.video-ov.open{display:flex}
+.video-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;z-index:1}
+.video-ov iframe{flex:1;border:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--teal);border-radius:4px;padding:10px 18px;font-size:12px;z-index:999;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;font-family:'Orbitron',monospace;letter-spacing:.5px;color:var(--teal);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SCANLINE EFFECT ── */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:9998}
 </style>
 </head>
 <body>
 
-<div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo" id="scramLogo">FINDEST</div>
-  <div class="loading-sub" id="scramSub">SPORT SUPPLEMENT</div>
-  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo" id="loaderLogo">FINDEST</div>
+  <div class="loader-ring"></div>
+  <div class="loader-pct" id="loaderPct">LOADING... 0%</div>
+  <div class="loader-sub">SPORT SUPPLEMENT — BALI</div>
 </div>
 
-<div class="hero">
+<!-- HERO -->
+<div id="heroWrap">
   <canvas id="heroCanvas"></canvas>
-  <div class="hero-content-wrap">
-    <div class="hero-logo" style="opacity:0" id="heroLogo">
-      <div class="hero-logo-icon">FS</div>
-      <div>
-        <div class="hero-logo-name">FINDEST SPORT</div>
-        <div class="hero-logo-sub">Official Distributor — Bali</div>
-      </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="hEye">EXCLUSIVE DISTRIBUTOR — BALI</div>
+    <div class="hero-title-wrap">
+      <h1 class="hero-title" id="hTitle">FUEL YOUR<br><span class="accent">POTENTIAL.</span></h1>
     </div>
-    <h1 class="hero-title">
-      <span class="line"><span class="word" id="hw1">FUEL</span> <span class="word" id="hw2">YOUR</span></span>
-      <span class="line"><span class="word" id="hw3" style="color:var(--teal)">POTENTIAL.</span></span>
-    </h1>
-    <p class="hero-desc reveal-up" id="heroDesc" style="opacity:0">Supplement premium ON, BSN & ISOPURE. Harga distributor langsung — 100% authentic.</p>
-    <div class="hero-badges reveal-up" id="heroBadges" style="opacity:0">
-      <span class="badge-pill teal">✓ 100% Authentic</span>
-      <span class="badge-pill teal">✓ Exclusive ON Bali</span>
-      <span class="badge-pill gold">⚡ Order via WhatsApp</span>
+    <p class="hero-sub" id="hSub">Suplemen premium ON, BSN & ISOPURE.<br>Harga distributor · 100% authentic · Fast delivery.</p>
+    <div class="hero-pills" id="hPills">
+      <span class="hpill g">✓ 100% Original</span>
+      <span class="hpill g">✓ Exclusive ON Bali</span>
+      <span class="hpill y">⚡ Order via WhatsApp</span>
     </div>
+    <button class="hero-cta" id="hCta" onclick="document.querySelector('.topbar').scrollIntoView({behavior:'smooth'})">
+      LIHAT PRODUK <span style="font-size:16px">→</span>
+    </button>
+  </div>
+  <div class="hero-scroll" id="hScroll">
+    <span>SCROLL</span>
+    <div class="hero-scroll-line"></div>
   </div>
 </div>
 
-<!-- STATS BAR -->
-<div class="stats-bar reveal-up" id="statsBar" style="opacity:0">
-  <div class="stat-item"><div class="stat-num" id="sn1">0</div><div class="stat-label">Produk SKU</div></div>
-  <div class="stat-item"><div class="stat-num" id="sn2">0</div><div class="stat-label">Customer Aktif</div></div>
-  <div class="stat-item"><div class="stat-num" id="sn3">0</div><div class="stat-label">Outlet Bali</div></div>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat" id="st1"><div class="stat-num" id="sn1">0</div><div class="stat-label">PRODUK SKU</div></div>
+  <div class="stat" id="st2"><div class="stat-num" id="sn2">0</div><div class="stat-label">CUSTOMER AKTIF</div></div>
+  <div class="stat" id="st3"><div class="stat-num" id="sn3">0</div><div class="stat-label">OUTLET BALI</div></div>
 </div>
 
-<div class="search-wrap">
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">FS</div>
   <div class="search-box">
-    <span style="font-size:17px">🔍</span>
-    <input type="text" id="searchInput" placeholder="Cari produk, brand, flavor..." oninput="filterProducts()"/>
-    <span id="clearSearch" style="color:var(--muted);cursor:pointer;display:none;font-size:16px" onclick="clearSearch()">✕</span>
+    <span style="font-size:14px;color:var(--muted)">⌕</span>
+    <input type="text" id="searchInput" placeholder="Cari produk, brand, flavor..." oninput="filterProducts()">
+    <span id="clearSearch" style="color:var(--muted);cursor:pointer;display:none" onclick="clearSearch()">✕</span>
   </div>
 </div>
 
-<div class="cat-scroll">
-  <button class="cat-btn active" onclick="setCategory('all',this)">🏆 Semua</button>
-  <button class="cat-btn" onclick="setCategory('ON',this)">🥇 ON</button>
-  <button class="cat-btn" onclick="setCategory('BSN',this)">💪 BSN</button>
-  <button class="cat-btn" onclick="setCategory('ISOPURE',this)">🧬 ISOPURE</button>
-  <button class="cat-btn" onclick="setCategory('Protein',this)">🥩 Protein</button>
-  <button class="cat-btn" onclick="setCategory('Mass Gainer',this)">📈 Gainer</button>
-  <button class="cat-btn" onclick="setCategory('Creatine',this)">⚡ Creatine</button>
-  <button class="cat-btn" onclick="setCategory('Amino',this)">🔬 Amino</button>
-  <button class="cat-btn" onclick="setCategory('Pre-Workout',this)">🔥 Pre-WO</button>
-  <button class="cat-btn" onclick="setCategory('Vitamin',this)">💊 Vitamin</button>
+<!-- CATEGORIES -->
+<div class="cat-wrap">
+  <button class="cat-btn active" onclick="setCategory('all',this)">ALL</button>
+  <button class="cat-btn" onclick="setCategory('ON',this)">ON</button>
+  <button class="cat-btn" onclick="setCategory('BSN',this)">BSN</button>
+  <button class="cat-btn" onclick="setCategory('ISOPURE',this)">ISOPURE</button>
+  <button class="cat-btn" onclick="setCategory('Protein',this)">PROTEIN</button>
+  <button class="cat-btn" onclick="setCategory('Mass Gainer',this)">GAINER</button>
+  <button class="cat-btn" onclick="setCategory('Creatine',this)">CREATINE</button>
+  <button class="cat-btn" onclick="setCategory('Amino',this)">AMINO</button>
+  <button class="cat-btn" onclick="setCategory('Pre-Workout',this)">PRE-WO</button>
+  <button class="cat-btn" onclick="setCategory('Vitamin',this)">VITAMIN</button>
 </div>
 
-<div class="section-label" id="sectionLabel">SEMUA PRODUK</div>
-<div class="section-count" id="sectionCount">Memuat produk...</div>
-<div class="product-grid" id="productGrid"></div>
-
-<button class="cart-fab hidden" id="cartFab" onclick="openCart()">
-  <span>🛒 Pesanan</span>
-  <div style="display:flex;align-items:center;gap:6px">
-    <span id="cartTotal" style="font-size:12px">Rp 0</span>
-    <div class="cart-fab-count" id="cartCount">0</div>
+<!-- FEATURED SLIDER -->
+<div id="sliderWrap" style="display:none">
+  <div class="sec-header">
+    <div class="sec-title">FEATURED</div>
+    <div class="sarrows">
+      <button class="sarr" onclick="slideMove(-1)">‹</button>
+      <button class="sarr" onclick="slideMove(1)">›</button>
+    </div>
   </div>
-</button>
-
-<div class="modal-overlay" id="productModal" onclick="handleModalBg(event,'productModal')">
-  <div class="modal-sheet"><div class="modal-drag"></div><div id="productModalContent"></div></div>
+  <div class="slider-outer"><div class="slider-track" id="sliderTrack"></div></div>
+  <div style="display:flex;justify-content:center;padding:0 16px 8px"><div class="sdots" id="sliderDots"></div></div>
 </div>
 
-<div class="modal-overlay" id="cartModal" onclick="handleModalBg(event,'cartModal')">
-  <div class="modal-sheet" style="max-height:88vh"><div class="modal-drag"></div><div style="padding:0 18px 32px" id="cartContent"></div></div>
+<!-- PRODUCT SECTION -->
+<div class="sec-header">
+  <div class="sec-title" id="sectionLabel">ALL PRODUCTS</div>
+  <div class="sec-count" id="sectionCount"></div>
+</div>
+<div class="prod-grid" id="productGrid"></div>
+
+<!-- CART FAB -->
+<div class="cart-fab" id="cartFab" onclick="openCart()">
+  <span>🛒 PESANAN</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="cartTotalFab" style="font-size:11px;font-family:'Orbitron',monospace">Rp 0</span>
+    <div class="cart-fab-badge" id="cartCountBadge">0</div>
+  </div>
 </div>
 
-<div class="video-overlay" id="videoOverlay">
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal" onclick="handleBg(event,'productModal')">
+  <div class="modal-sheet"><div class="modal-drag"></div><div class="modal-body" id="productModalContent"></div></div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal-overlay" id="cartModal" onclick="handleBg(event,'cartModal')">
+  <div class="modal-sheet" style="max-height:90vh"><div class="modal-drag"></div><div class="modal-body" id="cartContent"></div></div>
+</div>
+
+<!-- VIDEO OVERLAY -->
+<div class="video-ov" id="videoOv">
   <button class="video-close" onclick="closeVideo()">✕</button>
   <iframe id="videoFrame" allow="autoplay"></iframe>
 </div>
@@ -245,299 +326,577 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 <div class="toast" id="toast"></div>
 
 <script>
+// ════════════════════════════════════════════
+// SUPABASE
+// ════════════════════════════════════════════
 const SUPABASE_URL='https://wuejoxgbtvmlrriwlofk.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1ZWpveGdidHZtbHJyaXdsb2ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjY1NTQsImV4cCI6MjA5Mjg0MjU1NH0.nq0xlsuXeJNXtb8SisPQ3Ml5fXNy2vguVRJ8pNFGai0';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let allProducts=[],cart={},currentCategory='all',searchQ='',selectedProduct=null,modalQty=1;
 let salesWA='',salesName='Findest Sport',bankNama='',bankRekening='',bankAtasNama='',qrisUrl='';
-const EMOJI={ON:'🏆',BSN:'💪',ISOPURE:'🧬'};
-const BCLS={ON:'brand-ON',BSN:'brand-BSN',ISOPURE:'brand-ISOPURE'};
+let selectedPayment='';
+let sliderPos=0,sliderMax=0;
 
-function fmt(n){return'Rp '+Math.round(n||0).toLocaleString('id-ID')}
+const fmt=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const EMOJI={ON:'🏆',BSN:'💪',ISOPURE:'❄️'};
 
-async function init(){
-  try{
-    const[cfg,prods]=await Promise.all([
-      sb.from('config').select('key,value').in('key',['catalog_wa','catalog_sales_name','bank_nama','bank_rekening','bank_atas_nama','qris_url']),
-      sb.from('products').select('id,nama,brand,kategori,harga,foto_url,deskripsi,status,video_url,stok').eq('status','Aktif').order('brand').order('nama')
-    ]);
-    if(cfg.data) cfg.data.forEach(r=>{
-      if(r.key==='catalog_wa') {
-        let wa = (r.value||'').replace(/[\s\-]/g,'');
-        if(wa.startsWith('+62')) wa = wa.slice(1);
-        else if(wa.startsWith('08')) wa = '62' + wa.slice(1);
-        else if(wa.startsWith('8') && !wa.startsWith('62')) wa = '62' + wa;
-        salesWA = wa;
-      }
-      if(r.key==='bank_nama') bankNama=r.value||'';
-      if(r.key==='bank_rekening') bankRekening=r.value||'';
-      if(r.key==='bank_atas_nama') bankAtasNama=r.value||'';
-      if(r.key==='qris_url') qrisUrl=r.value||'';
-      if(r.key==='catalog_sales_name') salesName=r.value||'Findest Sport';
-    });
-    allProducts=prods.data||[];
-    renderProducts();
-  }catch(e){
-    console.error(e);
-    document.getElementById('sectionCount').textContent='Gagal memuat produk. Cek koneksi.';
+// ════════════════════════════════════════════
+// TEXT SCRAMBLE
+// ════════════════════════════════════════════
+const CHARS='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
+function scramble(el,target,ms=800){
+  let iter=0;
+  const iv=setInterval(()=>{
+    el.textContent=target.split('').map((c,i)=>{
+      if(c===' ')return ' ';
+      if(i<iter)return target[i];
+      return CHARS[Math.floor(Math.random()*CHARS.length)];
+    }).join('');
+    if(iter>=target.length){clearInterval(iv);}
+    iter+=0.5;
+  },40);
+}
+
+// ════════════════════════════════════════════
+// THREE.JS ROBOT
+// ════════════════════════════════════════════
+function initRobot(){
+  const canvas=document.getElementById('heroCanvas');
+  if(!canvas||!THREE)return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+  camera.position.set(0,0.5,6);
+
+  function resize(){
+    const w=canvas.offsetWidth,h=canvas.offsetHeight;
+    renderer.setSize(w,h,false);
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    camera.aspect=w/h;camera.updateProjectionMatrix();
   }
-  setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'),900);
+  resize();
+  window.addEventListener('resize',resize);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x00D4B1,0.4));
+  const d=new THREE.DirectionalLight(0x00ff88,1.5);d.position.set(3,5,3);scene.add(d);
+  const r=new THREE.DirectionalLight(0x4169E1,0.8);r.position.set(-3,1,-2);scene.add(r);
+  const b=new THREE.DirectionalLight(0x00D4B1,0.3);b.position.set(0,-3,2);scene.add(b);
+
+  const M=(c,e=0)=>new THREE.MeshPhongMaterial({color:c,emissive:new THREE.Color(c).multiplyScalar(e),shininess:120});
+  const Bx=(w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  const Cy=(rt,rb,h,m)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,16),m);
+  const Sp=(r,m)=>new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);
+
+  const mat={
+    body:M(0x0a1f14),
+    acc:M(0x00D4B1,.25),
+    glow:M(0x00ff88,.9),
+    dark:M(0x040d08),
+    gold:M(0xF5A623,.2),
+    blue:M(0x4169E1,.2)
+  };
+
+  const robot=new THREE.Group();
+  scene.add(robot);
+
+  // Torso
+  const torso=Bx(1.1,1.4,.7,mat.body);robot.add(torso);
+  // Chest plates
+  const cp=Bx(.7,.6,.07,mat.acc);cp.position.set(0,.1,.37);robot.add(cp);
+  // Chest glow lines
+  for(let i=-1;i<=1;i+=2){const l=Bx(.5,.04,.05,mat.glow);l.position.set(0,i*.14,.39);robot.add(l);}
+  // Core reactor
+  const core=Sp(.12,mat.glow);core.position.set(0,.1,.39);robot.add(core);
+  const coreRing=new THREE.Mesh(new THREE.TorusGeometry(.16,.025,8,24),mat.acc);
+  coreRing.position.set(0,.1,.37);coreRing.rotation.x=Math.PI/2;robot.add(coreRing);
+  // Side vents
+  for(let x of[-0.6,0.6]){
+    for(let i=0;i<3;i++){const v=Bx(.06,.08,.05,mat.dark);v.position.set(x,.3-i*.18,.2);robot.add(v);}
+  }
+
+  // Head
+  const head=new THREE.Group();head.position.y=1.0;
+  const hb=Bx(.85,.75,.7,mat.body);head.add(hb);
+  // Visor
+  const vis=Bx(.65,.25,.08,mat.dark);vis.position.set(0,.06,.38);head.add(vis);
+  // Eyes
+  for(let x of[-0.18,0.18]){
+    const eye=Sp(.09,mat.glow);eye.position.set(x,.06,.4);head.add(eye);
+    const er=new THREE.Mesh(new THREE.TorusGeometry(.12,.02,8,20),mat.acc);
+    er.position.set(x,.06,.37);er.rotation.x=Math.PI/2;head.add(er);
+  }
+  // Mouth
+  const mth=Bx(.4,.05,.05,mat.acc);mth.position.set(0,-.13,.38);head.add(mth);
+  for(let i=-1;i<=1;i+=2){const mt=Bx(.05,.05,.05,mat.glow);mt.position.set(i*.15,-.13,.4);head.add(mt);}
+  // Antenna
+  const as=Cy(.035,.035,.25,mat.dark);as.position.y=.5;head.add(as);
+  const at=Sp(.08,mat.glow);at.position.y=.65;head.add(at);
+  // Ear panels
+  for(let x of[-0.48,0.48]){const ep=Bx(.1,.3,.12,mat.acc);ep.position.set(x,0,0);head.add(ep);}
+  // Crown detail
+  const crown=Bx(.7,.08,.55,mat.acc);crown.position.y=.42;head.add(crown);
+  robot.add(head);
+
+  // Neck
+  const neck=Cy(.17,.2,.2,mat.dark);neck.position.y=.78;robot.add(neck);
+
+  // Shoulder pads
+  for(let x of[-0.72,0.72]){
+    const sp=Bx(.26,.28,.28,mat.acc);sp.position.set(x,.73,0);robot.add(sp);
+    const sl=Bx(.18,.06,.06,mat.glow);sl.position.set(x,.73,.18);robot.add(sl);
+  }
+
+  // Arms
+  function makeArm(side){
+    const arm=new THREE.Group();arm.position.set(side*.76,.32,0);
+    const upper=Cy(.14,.16,.55,mat.body);upper.position.y=-.27;arm.add(upper);
+    const joint=Sp(.155,mat.acc);arm.add(joint);
+    const elbow=Bx(.2,.15,.15,mat.dark);elbow.position.y=-.56;arm.add(elbow);
+    const lower=Cy(.12,.14,.48,mat.dark);lower.position.y=-.82;arm.add(lower);
+    const hand=Bx(.24,.2,.2,mat.acc);hand.position.y=-1.1;arm.add(hand);
+    // Fingers
+    for(let i=0;i<3;i++){const f=Bx(.06,.15,.06,mat.dark);f.position.set((i-1)*.08,-1.26,0);arm.add(f);}
+    // Arm detail
+    const ad=Bx(.1,.06,.06,mat.glow);ad.position.set(0,-.5,.16);arm.add(ad);
+    return arm;
+  }
+  const leftArm=makeArm(-1);robot.add(leftArm);
+  const rightArm=makeArm(1);robot.add(rightArm);
+
+  // Hip
+  const hip=Bx(.92,.26,.62,mat.dark);hip.position.y=-.82;robot.add(hip);
+  const hipL=Bx(.6,.04,.04,mat.glow);hipL.position.set(0,-.7,.32);robot.add(hipL);
+
+  // Legs
+  function makeLeg(side){
+    const leg=new THREE.Group();leg.position.set(side*.28,-1.04,0);
+    const upper=Cy(.18,.16,.48,mat.body);upper.position.y=-.24;leg.add(upper);
+    const knee=Sp(.18,mat.acc);leg.add(knee);
+    const kd=Bx(.16,.08,.08,mat.glow);kd.position.set(0,.02,.18);leg.add(kd);
+    const lower=Cy(.15,.17,.46,mat.dark);lower.position.y=-.5;leg.add(lower);
+    const foot=Bx(.25,.14,.44,mat.body);foot.position.set(.02,-.77,.06);leg.add(foot);
+    const ft=Bx(.18,.06,.06,mat.acc);ft.position.set(0,-.7,.24);leg.add(ft);
+    return leg;
+  }
+  robot.add(makeLeg(-1));robot.add(makeLeg(1));
+
+  // Ground ring
+  const gr=new THREE.Mesh(new THREE.TorusGeometry(1.2,.02,8,60),mat.acc);
+  gr.rotation.x=Math.PI/2;gr.position.y=-2.0;scene.add(gr);
+  const gr2=new THREE.Mesh(new THREE.TorusGeometry(1.8,.01,8,60),new THREE.MeshPhongMaterial({color:0x00D4B1,emissive:new THREE.Color(0x00D4B1).multiplyScalar(.1)}));
+  gr2.rotation.x=Math.PI/2;gr2.position.y=-2.0;scene.add(gr2);
+
+  // Grid floor
+  const grd=new THREE.GridHelper(12,24,0x00D4B1,0x0a1f14);
+  grd.position.y=-2.0;grd.material.transparent=true;grd.material.opacity=.25;scene.add(grd);
+
+  // Particles
+  const pg=new THREE.BufferGeometry();
+  const pc=100,pp=new Float32Array(pc*3);
+  for(let i=0;i<pc;i++){pp[i*3]=(Math.random()-.5)*10;pp[i*3+1]=(Math.random()-.5)*8;pp[i*3+2]=(Math.random()-.5)*6-1;}
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  const pm=new THREE.PointsMaterial({color:0x00D4B1,size:.05,transparent:true,opacity:.5});
+  const pts=new THREE.Points(pg,pm);scene.add(pts);
+
+  robot.position.set(1.0,-.3,0);
+  robot.scale.setScalar(.85);
+
+  // GSAP entry
+  if(typeof gsap!=='undefined'){
+    gsap.from(robot.position,{y:-4,duration:1.4,ease:'elastic.out(1,.5)',delay:.5});
+    gsap.from(robot.rotation,{y:Math.PI*2,duration:1.6,ease:'power3.out',delay:.5});
+    gsap.from(robot.scale,{x:0,y:0,z:0,duration:.8,ease:'back.out(2)',delay:.5});
+  }
+
+  let t=0;
+  const antTip=head.children.find(c=>c.geometry&&c.geometry.type==='SphereGeometry'&&c.position.y>.5);
+  const eyeGlows=head.children.filter(c=>c.geometry&&c.geometry.type==='SphereGeometry'&&c.position.z>.3);
+  
+  function loop(){
+    requestAnimationFrame(loop);
+    t+=.012;
+    robot.position.y=-.3+Math.sin(t*.7)*.09;
+    robot.rotation.y=-.15+Math.sin(t*.35)*.15;
+    head.rotation.y=Math.sin(t*.45)*.28;
+    head.rotation.x=Math.sin(t*.5)*.07;
+    leftArm.rotation.z=-.15+Math.sin(t*1.1)*.22;
+    leftArm.rotation.x=Math.sin(t*.8)*.12;
+    rightArm.rotation.z=.15-Math.sin(t*1.1)*.22;
+    rightArm.rotation.x=-Math.sin(t*.8)*.12;
+    if(antTip)antTip.scale.setScalar(.8+Math.sin(t*4)*.3);
+    core.scale.setScalar(.9+Math.sin(t*3)*.15);
+    coreRing.rotation.z=t*1.5;
+    pts.rotation.y=t*.025;
+    grd.position.z=(t*.3)%0.5;
+    renderer.render(scene,camera);
+  }
+  loop();
+}
+
+// ════════════════════════════════════════════
+// GSAP HERO INTRO
+// ════════════════════════════════════════════
+function heroIntro(){
+  if(!gsap)return;
+  const tl=gsap.timeline({delay:.3});
+  tl.to('#hEye',{opacity:1,x:0,duration:.5,ease:'power2.out'})
+    .to('#hTitle',{y:0,opacity:1,duration:.6,ease:'power3.out'},'-=.1')
+    .to('#hSub',{opacity:1,duration:.4},'-=.1')
+    .to('#hPills',{opacity:1,y:0,duration:.4},'-=.1')
+    .to('#hCta',{opacity:1,y:0,duration:.5,ease:'elastic.out(1.2,.5)'},'-=.1')
+    .to('#hScroll',{opacity:1,duration:.4},'-=.2')
+    .to(['.stat'],{opacity:1,y:0,duration:.4,stagger:.08},'-=.2')
+    .call(()=>{
+      gsap.to({v:0},{v:67,duration:1.5,ease:'power2.out',onUpdate:function(){const e=document.getElementById('sn1');if(e)e.textContent=Math.round(this.targets()[0].v);}});
+      gsap.to({v:0},{v:103,duration:1.5,ease:'power2.out',onUpdate:function(){const e=document.getElementById('sn2');if(e)e.textContent=Math.round(this.targets()[0].v);}});
+      gsap.to({v:0},{v:18,duration:1.5,ease:'power2.out',onUpdate:function(){const e=document.getElementById('sn3');if(e)e.textContent=Math.round(this.targets()[0].v);}});
+    });
+}
+
+// ════════════════════════════════════════════
+// LOADER ANIMATION
+// ════════════════════════════════════════════
+function runLoader(onDone){
+  const logo=document.getElementById('loaderLogo');
+  const pct=document.getElementById('loaderPct');
+  scramble(logo,'FINDEST',1000);
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*8+2;
+    if(p>=100){p=100;clearInterval(iv);setTimeout(onDone,300);}
+    pct.textContent='LOADING... '+Math.round(p)+'%';
+  },80);
+}
+
+// ════════════════════════════════════════════
+// INIT — LOAD DATA
+// ════════════════════════════════════════════
+async function init(){
+  const[cfg,prods]=await Promise.all([
+    sb.from('config').select('key,value'),
+    sb.from('products').select('id,nama,brand,kategori,harga,hpp,foto_url,deskripsi,status,video_url,stok').eq('status','Aktif').order('brand').order('nama')
+  ]);
+  if(cfg.data)cfg.data.forEach(r=>{
+    if(r.key==='catalog_wa'){let wa=(r.value||'').replace(/[\s\-]/g,'');if(wa.startsWith('+62'))wa=wa.slice(1);else if(wa.startsWith('08'))wa='62'+wa.slice(1);salesWA=wa;}
+    if(r.key==='catalog_sales_name')salesName=r.value||'Findest Sport';
+    if(r.key==='bank_nama')bankNama=r.value||'';
+    if(r.key==='bank_rekening')bankRekening=r.value||'';
+    if(r.key==='bank_atas_nama')bankAtasNama=r.value||'';
+    if(r.key==='qris_url')qrisUrl=r.value||'';
+  });
+  allProducts=prods.data||[];
+  initSlider();
+  renderProducts();
+}
+
+// ════════════════════════════════════════════
+// SLIDER
+// ════════════════════════════════════════════
+function initSlider(){
+  const featured=allProducts.slice(0,8);
+  if(featured.length<3)return;
+  const wrap=document.getElementById('sliderWrap');
+  if(wrap)wrap.style.display='block';
+  const track=document.getElementById('sliderTrack');
+  const dots=document.getElementById('sliderDots');
+  track.innerHTML=featured.map(p=>{
+    const stok=p.stok!=null?parseInt(p.stok):null;
+    const habis=stok===0;
+    const emoji=EMOJI[p.brand]||'📦';
+    const bc=p.brand==='ON'?'#0a1f0a':p.brand==='BSN'?'#0a0a1f':'#0a1a1f';
+    return '<div class="pc" style="flex:0 0 145px;animation:none;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))" onclick="openProduct('+p.id+')">'
+      +'<div class="pc-img" style="background:linear-gradient(135deg,'+bc+',#050810)">'
+      +(p.foto_url?'<img src="'+p.foto_url+'" style="width:80%;height:80%;object-fit:contain" onerror="this.outerHTML=\''+emoji+'\'">':emoji)
+      +'<div class="pc-corner"></div>'
+      +'<div class="pc-brand '+p.brand+'">'+p.brand+'</div>'
+      +(stok===0?'<div class="pc-stok habis">HABIS</div>':stok&&stok<=10?'<div class="pc-stok terbatas">SISA '+stok+'</div>':'')
+      +'</div>'
+      +'<div class="pc-body">'
+      +'<div class="pc-kat">'+( p.kategori||'')+'</div>'
+      +'<div class="pc-name">'+p.nama+'</div>'
+      +'<div class="pc-price'+(p.harga?'':' no-price')+'">'+(p.harga?fmt(p.harga):'Hubungi Sales')+'</div>'
+      +'<button class="pc-add" '+(habis?'disabled':'')+' onclick="event.stopPropagation();quickAdd(event,'+p.id+')">'+(habis?'HABIS':'+ ADD')+'</button>'
+      +'</div></div>';
+  }).join('');
+  
+  sliderMax=Math.max(0,featured.length-2);
+  dots.innerHTML='';
+  for(let i=0;i<=sliderMax;i++){
+    const d=document.createElement('div');
+    d.className='sdot'+(i===0?' active':'');
+    d.onclick=()=>goSlide(i);
+    dots.appendChild(d);
+  }
+
+  if(gsap){
+    gsap.fromTo('#sliderTrack .pc',
+      {opacity:0,y:20},
+      {opacity:1,y:0,duration:.4,stagger:.06,ease:'back.out(1.5)',delay:.3}
+    );
+  }
+}
+
+function goSlide(idx){
+  sliderPos=Math.max(0,Math.min(idx,sliderMax));
+  const w=145+10;
+  if(gsap)gsap.to('#sliderTrack',{x:-sliderPos*w,duration:.5,ease:'power3.out'});
+  document.querySelectorAll('.sdot').forEach((d,i)=>d.classList.toggle('active',i===sliderPos));
+}
+function slideMove(dir){goSlide(sliderPos+dir);}
+
+// Touch swipe
+let tx0=0;
+document.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const diff=tx0-e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50&&document.getElementById('sliderTrack'))slideMove(diff>0?1:-1);
+},{passive:true});
+
+// ════════════════════════════════════════════
+// RENDER PRODUCTS
+// ════════════════════════════════════════════
+function getFiltered(){
+  return allProducts.filter(p=>{
+    const mCat=currentCategory==='all'||(p.brand===currentCategory||p.kategori===currentCategory);
+    const mQ=!searchQ||p.nama.toLowerCase().includes(searchQ)||p.brand.toLowerCase().includes(searchQ)||(p.kategori||'').toLowerCase().includes(searchQ);
+    return mCat&&mQ;
+  });
+}
+
+function renderProducts(){
+  const list=getFiltered();
+  const grid=document.getElementById('productGrid');
+  const lbl=document.getElementById('sectionLabel');
+  const cnt=document.getElementById('sectionCount');
+  if(lbl)lbl.textContent=currentCategory==='all'?'ALL PRODUCTS':currentCategory.toUpperCase();
+  if(cnt)cnt.textContent=list.length+' PRODUK';
+  
+  if(!list.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-family:\'Orbitron\',monospace;font-size:12px;letter-spacing:2px">NO PRODUCTS FOUND</div>';
+    return;
+  }
+
+  grid.innerHTML=list.map((p,i)=>{
+    const stok=p.stok!=null?parseInt(p.stok):null;
+    const habis=stok===0;
+    const terbatas=stok!=null&&stok>0&&stok<=10;
+    const emoji=EMOJI[p.brand]||'📦';
+    const bc=p.brand==='ON'?'#0a1f0a':p.brand==='BSN'?'#0a0a1f':'#0a1a1f';
+    const inCart=!!cart[p.id];
+    return '<div class="pc'+(inCart?' in-cart':'')+(habis?' habis':'')+'" style="animation-delay:'+(i*.04)+'s" onclick="openProduct('+p.id+')">'
+      +'<div class="pc-img" style="background:linear-gradient(135deg,'+bc+',#050810)">'
+      +(p.foto_url?'<img src="'+p.foto_url+'" style="width:80%;height:80%;object-fit:contain" onerror="this.outerHTML=\''+emoji+'\'">':emoji)
+      +'<div class="pc-corner"></div>'
+      +'<div class="pc-brand '+p.brand+'">'+p.brand+'</div>'
+      +(habis?'<div class="pc-stok habis">HABIS</div>':terbatas?'<div class="pc-stok terbatas">SISA '+stok+'</div>':'')
+      +'</div>'
+      +'<div class="pc-body">'
+      +'<div class="pc-kat">'+(p.kategori||'')+'</div>'
+      +'<div class="pc-name">'+p.nama+'</div>'
+      +'<div class="pc-price'+(p.harga?'':' no-price')+'">'+(p.harga?fmt(p.harga):'Hubungi Sales')+'</div>'
+      +'<button class="pc-add'+(inCart?' added':'')+'" '+(habis?'disabled':'')+' onclick="event.stopPropagation();quickAdd(event,'+p.id+')">'
+      +(habis?'HABIS':inCart?'✓ ADDED':'+ ADD')
+      +'</button>'
+      +'</div></div>';
+  }).join('');
 }
 
 function setCategory(cat,btn){
   currentCategory=cat;
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn)btn.classList.add('active');
   renderProducts();
 }
 
 function filterProducts(){
-  searchQ=document.getElementById('searchInput').value.toLowerCase();
-  document.getElementById('clearSearch').style.display=searchQ?'block':'none';
+  const v=document.getElementById('searchInput').value.trim();
+  searchQ=v.toLowerCase();
+  document.getElementById('clearSearch').style.display=v?'block':'none';
   renderProducts();
 }
-
 function clearSearch(){
-  document.getElementById('searchInput').value='';
-  searchQ='';
+  searchQ='';document.getElementById('searchInput').value='';
   document.getElementById('clearSearch').style.display='none';
   renderProducts();
 }
 
-function getFiltered(){
-  return allProducts.filter(p=>{
-    const mCat=currentCategory==='all'||p.brand===currentCategory||(p.kategori||'').toLowerCase()===currentCategory.toLowerCase();
-    const mQ=!searchQ||(p.nama||'').toLowerCase().includes(searchQ)||(p.brand||'').toLowerCase().includes(searchQ)||(p.kategori||'').toLowerCase().includes(searchQ)||(p.deskripsi||'').toLowerCase().includes(searchQ);
-    return mCat&&mQ;
-  });
+// ════════════════════════════════════════════
+// CART
+// ════════════════════════════════════════════
+function quickAdd(e,id){
+  e.stopPropagation();
+  const p=allProducts.find(x=>x.id===id);
+  if(!p||p.stok===0)return;
+  cart[id]=cart[id]?{product:p,qty:cart[id].qty+1}:{product:p,qty:1};
+  updateCartUI();
+  showToast('+ '+p.nama.substring(0,25)+'...');
+  renderProducts();
+  if(gsap){
+    const btn=e.target;
+    gsap.timeline().to(btn,{scale:.85,duration:.08}).to(btn,{scale:1.1,duration:.15,ease:'elastic.out(1.5,.5)'}).to(btn,{scale:1,duration:.1});
+    gsap.to('#cartCountBadge',{scale:1.3,duration:.15,yoyo:true,repeat:1});
+  }
 }
 
-const CAT_LABEL={all:'SEMUA PRODUK',ON:'ON — OPTIMUM NUTRITION',BSN:'BSN SUPPLEMENT',ISOPURE:'ISOPURE',Protein:'WHEY PROTEIN','Mass Gainer':'MASS GAINER',Creatine:'CREATINE',Amino:'AMINO / BCAA','Pre-Workout':'PRE-WORKOUT',Vitamin:'VITAMIN'};
-
-function renderProducts(){
-  const f=getFiltered();
-  document.getElementById('sectionLabel').textContent=searchQ?`HASIL: "${searchQ.toUpperCase()}"`:CAT_LABEL[currentCategory]||'PRODUK';
-  document.getElementById('sectionCount').textContent=f.length+' produk tersedia';
-  const grid=document.getElementById('productGrid');
-  if(!f.length){grid.innerHTML='<div class="empty-state"><div style="font-size:44px;margin-bottom:10px">🔍</div><div style="font-size:13px">Produk tidak ditemukan.</div></div>';return;}
-  grid.innerHTML=f.map((p,i)=>{
-    const inCart=cart[p.id]?.qty>0;
-    const qty=cart[p.id]?.qty||0;
-    const emoji=EMOJI[p.brand]||'📦';
-    const bc=BCLS[p.brand]||'brand-ON';
-    const imgEl=p.foto_url?`<img src="${p.foto_url}" alt="${p.nama}" onerror="this.style.display='none'">`:'';
-    const priceEl=p.harga?`<div class="card-price">${fmt(p.harga)}</div>`:`<div class="no-price">Hubungi sales</div>`;
-    const stok=p.stok!=null?parseInt(p.stok):null;
-    const habis=stok===0;
-    const terbatas=stok!=null&&stok>0&&stok<=10;
-    const stokBadgeHtml=habis?'<div class="stok-badge stok-habis">❌ Habis</div>':terbatas?('<div class="stok-badge stok-terbatas">⚠️ Sisa '+stok+'</div>'):'';
-    const cardClick=habis?'':'openProduct('+p.id+')';
-    const btnLabel=habis?'❌ Stok Habis':inCart?'✓ ('+qty+')':'+ Tambah';
-    const btnClass='card-add-btn'+(inCart&&!habis?' added':'')+(habis?' btn-habis':'');
-    const btnClick=habis?'':'quickAdd(event,'+p.id+')';
-    const cardClass='product-card'+(inCart&&!habis?' in-cart':'')+(habis?' habis':'');
-    return`<div class="${cardClass}" onclick="${cardClick}" style="animation-delay:${i*.04}s">
-      <div class="card-img-wrap">
-        <div class="card-img">${imgEl||emoji}</div>
-        <div class="card-badge-brand ${bc}">${p.brand}</div>
-        ${p.video_url&&!habis?'<div class="card-video">▶ VIDEO</div>':''}
-        ${inCart&&!habis?'<div class="card-qty-badge">'+qty+'</div>':''}
-        ${stokBadgeHtml}
-      </div>
-      <div class="card-body">
-        <div class="card-name">${p.nama||'–'}</div>
-        <div class="card-variant">${p.kategori||''}</div>
-        ${priceEl}
-        <button class="${btnClass}" onclick="${btnClick}" ${habis?'disabled':''}>${btnLabel}</button>
-      </div>
-    </div>`;
-  }).join('');
+function changeCartQty(id,delta){
+  if(!cart[id])return;
+  cart[id].qty+=delta;
+  if(cart[id].qty<=0)delete cart[id];
+  updateCartUI();
+  openCart();
 }
+
+function updateCartUI(){
+  const items=Object.values(cart);
+  const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
+  const count=items.reduce((s,c)=>s+c.qty,0);
+  const fab=document.getElementById('cartFab');
+  const badge=document.getElementById('cartCountBadge');
+  const totalEl=document.getElementById('cartTotalFab');
+  if(badge)badge.textContent=count;
+  if(totalEl)totalEl.textContent=fmt(total);
+  if(fab){
+    if(count>0){fab.classList.add('show');}
+    else{fab.classList.remove('show');}
+  }
+}
+
+// ════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function handleBg(e,id){if(e.target.classList.contains('modal-overlay'))closeModal(id);}
 
 function openProduct(id){
-  selectedProduct=allProducts.find(p=>p.id===id);
-  if(!selectedProduct)return;
-  modalQty=cart[id]?.qty||1;
-  renderProductModal();
-  document.getElementById('productModal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-function renderProductModal(){
-  const p=selectedProduct;
+  const p=allProducts.find(x=>x.id===id);
+  if(!p)return;
+  selectedProduct=p;
+  modalQty=1;
+  const stok=p.stok!=null?parseInt(p.stok):null;
+  const habis=stok===0;
+  const terbatas=stok&&stok<=10;
   const emoji=EMOJI[p.brand]||'📦';
-  const bc=BCLS[p.brand]||'brand-ON';
-  const inCart=!!cart[p.id]?.qty;
-  const sub=p.harga*modalQty;
-  document.getElementById('productModalContent').innerHTML=`
-    <div class="modal-img">${p.foto_url?`<img src="${p.foto_url}" alt="${p.nama}" onerror="this.style.display='none'">`:''}${emoji}</div>
-    <div class="modal-body">
-      <div class="modal-brand-tag ${bc}">${p.brand}</div>
-      <div class="modal-name">${p.nama}</div>
-      <div class="modal-variant">${p.kategori||''}</div>
-      <div class="modal-price">${p.harga?fmt(p.harga):'–'} <span>/ unit</span></div>
-      ${p.deskripsi?`<p class="modal-desc">${p.deskripsi}</p>`:''}
-      ${p.video_url?`<div class="modal-video-btn" onclick="openVideo('${p.video_url}')"><span style="font-size:18px">▶</span><div><div>Tonton Video Produk</div><div style="font-size:10px;color:var(--muted);font-weight:400">Review & cara penggunaan</div></div></div>`:''}
-      <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty(-1)">−</button>
-        <div class="qty-num" id="mqn">${modalQty}</div>
-        <button class="qty-btn" onclick="changeQty(1)">+</button>
-        <span style="font-size:12px;color:var(--muted)">× ${fmt(p.harga)}</span>
-        <span id="msub" style="font-size:14px;font-weight:700;color:var(--teal);margin-left:auto">${fmt(sub)}</span>
-      </div>
-      <div id="modal-stok-section"></div>
-    </div>`;
-  // Inject stok section setelah innerHTML set
-  const stokSec=document.getElementById('modal-stok-section');
-  if(stokSec){
-    const ms=p.stok!=null?parseInt(p.stok):null;
-    const mh=ms===0;
-    const mt=ms!=null&&ms>0&&ms<=10;
-    const cartLabel=inCart?'✓ Update Pesanan':'🛒 Tambah ke Pesanan';
-    if(mh){
-      stokSec.innerHTML='<div class="stok-kosong-banner">❌ Stok Habis — Produk ini sedang tidak tersedia</div>';
-    }else if(mt){
-      stokSec.innerHTML='<div class="stok-warning">⚠️ Stok terbatas — tersisa '+ms+' unit</div><button class="add-to-cart-btn" onclick="addToCart('+p.id+')">'+cartLabel+'</button>';
-    }else{
-      stokSec.innerHTML='<button class="add-to-cart-btn" onclick="addToCart('+p.id+')">'+cartLabel+'</button>';
-    }
-  }
+  const bc=p.brand==='ON'?'#0a1f0a':p.brand==='BSN'?'#0a0a1f':'#0a1a1f';
+  const inCart=!!cart[id];
+
+  document.getElementById('productModalContent').innerHTML=
+    '<div class="pm-img" style="background:linear-gradient(135deg,'+bc+',#050810)">'
+    +(p.foto_url?'<img src="'+p.foto_url+'" onerror="this.outerHTML=\'<span style=font-size:72px>'+emoji+'</span>\'">':'<span style="font-size:72px">'+emoji+'</span>')
+    +'</div>'
+    +(p.video_url?'<div class="pm-video" onclick="openVideo(\''+p.video_url+'\')">▶ Tonton Video Produk</div>':'')
+    +(habis?'<div style="padding:10px 14px;background:rgba(255,59,92,.1);border:1px solid var(--red);border-radius:4px;font-size:12px;color:var(--red);font-family:\'Orbitron\',monospace;margin-bottom:14px;letter-spacing:1px">❌ STOK HABIS</div>':'')
+    +(terbatas&&!habis?'<div style="padding:8px 12px;background:rgba(245,166,35,.1);border:1px solid var(--gold);border-radius:4px;font-size:11px;color:var(--gold);font-family:\'Orbitron\',monospace;margin-bottom:12px">⚠ STOK TERBATAS — SISA '+stok+' UNIT</div>':'')
+    +'<div class="pm-brand '+p.brand+'">'+p.brand+'</div>'
+    +'<div class="pm-name">'+p.nama+'</div>'
+    +(p.deskripsi?'<div class="pm-desc">'+p.deskripsi+'</div>':'')
+    +'<div class="pm-price">'+(p.harga?fmt(p.harga):'Hubungi Sales')+'</div>'
+    +(!habis?'<div class="pm-qty"><button class="qty-btn" onclick="changeQty(-1)">−</button><div class="qty-num" id="mqty">1</div><button class="qty-btn" onclick="changeQty(1)">+</button><span style="font-size:12px;color:var(--muted);margin-left:6px">'+(p.harga?fmt(p.harga):'')+'</span></div>':'')
+    +(!habis?'<button class="pm-add" onclick="addToCartFromModal('+p.id+')">'+(inCart?'✓ UPDATE PESANAN':'+ TAMBAH KE PESANAN')+'</button>':'');
+
+  openModal('productModal');
 }
 
 function changeQty(d){
   modalQty=Math.max(1,modalQty+d);
-  document.getElementById('mqn').textContent=modalQty;
-  document.getElementById('msub').textContent=fmt(selectedProduct.harga*modalQty);
+  const el=document.getElementById('mqty');
+  if(el)el.textContent=modalQty;
 }
 
-function handleModalBg(e,id){if(e.target===document.getElementById(id))closeModal(id);}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
-
-function addToCart(id){
+function addToCartFromModal(id){
   const p=allProducts.find(x=>x.id===id);
   if(!p)return;
   cart[id]={product:p,qty:modalQty};
-  updateCartUI();closeModal('productModal');showToast('✓ '+p.nama+' ditambah!');renderProducts();
+  updateCartUI();
+  renderProducts();
+  closeModal('productModal');
+  showToast('✓ '+p.nama.substring(0,20)+'... x'+modalQty);
+  if(gsap)gsap.to('#cartFab',{scale:1.05,duration:.15,yoyo:true,repeat:1});
 }
 
-function quickAdd(e,id){
-  e.stopPropagation();
-  const p=allProducts.find(x=>x.id===id);
-  if(!p)return;
-  if(p.stok!=null&&parseInt(p.stok)===0){showToast('❌ Stok habis!');return;}
-  cart[id]=cart[id]?{product:p,qty:cart[id].qty+1}:{product:p,qty:1};
-  updateCartUI();showToast('✓ '+p.nama+' ('+cart[id].qty+')');renderProducts();
-}
-
-function updateCartUI(){
-  const items=Object.values(cart).filter(c=>c.qty>0);
-  const tq=items.reduce((s,c)=>s+c.qty,0);
-  const tp=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
-  document.getElementById('cartCount').textContent=tq;
-  document.getElementById('cartTotal').textContent=fmt(tp);
-  document.getElementById('cartFab').classList.toggle('hidden',tq===0);
-}
-
-function openCart(){renderCartModal();document.getElementById('cartModal').classList.add('open');document.body.style.overflow='hidden';}
-
-function changeCartQty(id,d){
-  if(!cart[id])return;
-  cart[id].qty=Math.max(0,cart[id].qty+d);
-  if(cart[id].qty===0)delete cart[id];
-  updateCartUI();renderCartModal();renderProducts();
-}
-
-function renderCartModal(){
+function openCart(){
   const items=Object.values(cart).filter(c=>c.qty>0);
   const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
-  if(!items.length){document.getElementById('cartContent').innerHTML='<div class="empty-state"><div style="font-size:44px;margin-bottom:10px">🛒</div><div style="font-size:13px">Pesanan masih kosong.</div></div>';return;}
+  if(!items.length){showToast('CART KOSONG');return;}
+
   const itemsHTML=items.map(c=>{
     const emoji=EMOJI[c.product.brand]||'📦';
-    return`<div class="cart-item">
-      <div class="cart-item-thumb">${c.product.foto_url?`<img src="${c.product.foto_url}" onerror="this.outerHTML='${emoji}'">`:''}${c.product.foto_url?'':emoji}</div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${c.product.nama}</div>
-        <div class="cart-item-variant">${c.product.brand} · ${c.product.kategori||''}</div>
-        <div class="cart-item-price">${fmt((c.product.harga||0)*c.qty)}</div>
-      </div>
-      <div class="cart-item-qty">
-        <button class="ci-qty-btn" onclick="changeCartQty(${c.product.id},-1)">−</button>
-        <div class="ci-qty-num">${c.qty}</div>
-        <button class="ci-qty-btn" onclick="changeCartQty(${c.product.id},1)">+</button>
-      </div>
-    </div>`;
+    return '<div class="ci">'
+      +'<div class="ci-thumb">'+(c.product.foto_url?'<img src="'+c.product.foto_url+'" onerror="this.outerHTML=\''+emoji+'\'">':emoji)+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div class="ci-name">'+c.product.nama+'</div>'
+        +'<div class="ci-brand">'+c.product.brand+'</div>'
+        +'<div class="ci-price">'+fmt((c.product.harga||0)*c.qty)+'</div>'
+      +'</div>'
+      +'<div class="ci-qty">'
+        +'<button class="ciq-btn" onclick="changeCartQty('+c.product.id+',-1)">−</button>'
+        +'<div class="ciq-num">'+c.qty+'</div>'
+        +'<button class="ciq-btn" onclick="changeCartQty('+c.product.id+',1)">+</button>'
+      +'</div>'
+      +'</div>';
   }).join('');
-  document.getElementById('cartContent').innerHTML=`
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;margin-bottom:3px">PESANAN KAMU</h2>
-    <p style="font-size:11px;color:var(--muted);margin-bottom:14px">${items.length} produk · ${items.reduce((s,c)=>s+c.qty,0)} unit</p>
-    ${itemsHTML}
-    <div class="cart-total"><span>Total</span><div class="cart-total-val">${fmt(total)}</div></div>
-    <div style="margin-top:14px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:10px">DATA PEMESAN</div>
-      <input class="order-input" id="buyerName" placeholder="Nama lengkap kamu *" type="text"/>
-      <input class="order-input" id="buyerPhone" placeholder="No. WhatsApp kamu *" type="tel"/>
-      <input class="order-input" id="buyerGym" placeholder="Nama gym / outlet (opsional)" type="text"/>
-      <input class="order-input" id="buyerAddress" placeholder="Alamat pengiriman (opsional)" type="text"/>
-      <textarea class="order-input" id="buyerNote" placeholder="Catatan: flavor, ukuran, dll..." rows="2" style="resize:none"></textarea>
 
-      <!-- METODE PEMBAYARAN -->
-      <div style="margin-top:14px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:10px">METODE PEMBAYARAN</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-          <div id="pay-card-qris" onclick="selectPayment('QRIS')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;text-align:center;background:var(--surface2)">
-            <div style="font-size:28px;margin-bottom:6px">💳</div>
-            <div style="font-weight:700;font-size:14px">QRIS</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">Scan & Pay</div>
-          </div>
-          <div id="pay-card-transfer" onclick="selectPayment('Transfer Bank')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;text-align:center;background:var(--surface2)">
-            <div style="font-size:28px;margin-bottom:6px">🏦</div>
-            <div style="font-weight:700;font-size:14px">Transfer Bank</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">Via rekening</div>
-          </div>
-        </div>
-        <div id="pay-detail-qris" style="display:none;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--teal);margin-bottom:8px">
-          <div style="font-weight:600;font-size:13px;margin-bottom:6px;color:var(--teal)">💳 QRIS</div>
-          <div id="pay-qris-content" style="font-size:12px;color:var(--muted)">QR Code akan dikonfirmasi via WhatsApp</div>
-        </div>
-        <div id="pay-detail-transfer" style="display:none;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--teal);margin-bottom:8px">
-          <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:var(--teal)">🏦 Info Transfer</div>
-          <div id="pay-bank-content" style="font-size:13px"><div style="color:var(--muted);font-size:11px">Memuat info rekening...</div></div>
-        </div>
-        <div id="pay-selected-badge" style="display:none;padding:8px 12px;background:rgba(0,212,177,.1);border:1px solid var(--teal);border-radius:8px;font-size:12px;color:var(--teal);font-weight:600">
-          ✅ Metode: <span id="pay-selected-label">–</span>
-        </div>
-      </div>
+  document.getElementById('cartContent').innerHTML=
+    '<div style="font-family:\'Orbitron\',monospace;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:4px">PESANAN</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:14px;font-family:\'Orbitron\',monospace">'+items.length+' PRODUK · '+items.reduce((s,c)=>s+c.qty,0)+' UNIT</div>'
+    +itemsHTML
+    +'<div class="cart-total-row"><span style="font-family:\'Orbitron\',monospace;font-size:12px;letter-spacing:1px">TOTAL</span><div class="cart-total-val">'+fmt(total)+'</div></div>'
+    +'<div class="form-section-title">DATA PEMESAN</div>'
+    +'<input class="finput" id="buyerName" placeholder="Nama lengkap *" type="text">'
+    +'<input class="finput" id="buyerPhone" placeholder="No. WhatsApp *" type="tel">'
+    +'<input class="finput" id="buyerGym" placeholder="Nama gym / outlet (opsional)" type="text">'
+    +'<input class="finput" id="buyerAddress" placeholder="Alamat pengiriman (opsional)" type="text">'
+    +'<textarea class="finput" id="buyerNote" placeholder="Catatan: flavor, ukuran, dll..." rows="2"></textarea>'
+    +'<div class="form-section-title">METODE PEMBAYARAN</div>'
+    +'<div class="pay-grid">'
+      +'<div class="pay-card" id="pcQris" onclick="selectPay(\'QRIS\')">'
+        +'<div class="pay-card-icon">💳</div>'
+        +'<div class="pay-card-title">QRIS</div>'
+        +'<div class="pay-card-sub">Scan & Pay</div>'
+      +'</div>'
+      +'<div class="pay-card" id="pcTransfer" onclick="selectPay(\'Transfer Bank\')">'
+        +'<div class="pay-card-icon">🏦</div>'
+        +'<div class="pay-card-title">TRANSFER</div>'
+        +'<div class="pay-card-sub">Via rekening</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="pay-info-box" id="payInfoQris">'
+      +'<div style="font-size:11px;color:var(--teal);font-family:\'Orbitron\',monospace;margin-bottom:8px">💳 QRIS</div>'
+      +(qrisUrl?'<img src="'+qrisUrl+'" style="width:100%;max-width:180px;border-radius:6px;margin:0 auto;display:block">':'<div style="font-size:12px;color:var(--muted)">QR dikirim via WhatsApp setelah order</div>')
+    +'</div>'
+    +'<div class="pay-info-box" id="payInfoTransfer">'
+      +'<div style="font-size:11px;color:var(--teal);font-family:\'Orbitron\',monospace;margin-bottom:8px">🏦 INFO TRANSFER</div>'
+      +(bankNama||bankRekening
+        ?'<div style="font-size:13px;line-height:2">'
+          +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:11px">Bank</span><b>'+bankNama+'</b></div>'
+          +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:11px">Rekening</span><b style="font-family:\'Orbitron\',monospace;letter-spacing:1px">'+bankRekening+'</b></div>'
+          +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:11px">Atas Nama</span><b>'+bankAtasNama+'</b></div>'
+          +'</div>'
+        :'<div style="font-size:12px;color:var(--muted)">Info rekening dikonfirmasi via WhatsApp</div>'
+      )
+    +'</div>'
+    +'<div class="pay-badge" id="payBadge">✓ METODE: <span id="payBadgeLabel">-</span></div>'
+    +'<button class="checkout-btn" onclick="sendOrder()">📲 KIRIM ORDER VIA WHATSAPP</button>'
+    +'<div class="checkout-hint">Sales kami balas dalam <strong style="color:var(--teal)">5–15 menit</strong> ⚡</div>';
 
-      <button class="checkout-btn" onclick="sendOrder()" style="margin-top:14px"><span>📲</span>Kirim Order via WhatsApp</button>
-      <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px">Sales kami balas dalam <strong style="color:var(--teal)">5–15 menit</strong> ⚡</div>
-    </div>`;
+  selectedPayment='';
+  openModal('cartModal');
 }
 
-let selectedPayment='';
-
-function selectPayment(method){
+function selectPay(method){
   selectedPayment=method;
-  ['qris','transfer'].forEach(id=>{
-    const card=document.getElementById('pay-card-'+id);
-    if(card){card.style.borderColor='var(--border)';card.style.background='var(--surface2)';}
-    const detail=document.getElementById('pay-detail-'+id);
-    if(detail)detail.style.display='none';
+  ['Qris','Transfer'].forEach(id=>{
+    const el=document.getElementById('pc'+id);
+    if(el)el.classList.toggle('sel',id===(method==='QRIS'?'Qris':'Transfer'));
+    const info=document.getElementById('payInfo'+id);
+    if(info)info.classList.toggle('show',id===(method==='QRIS'?'Qris':'Transfer'));
   });
-  const cardId=method==='QRIS'?'qris':'transfer';
-  const sel=document.getElementById('pay-card-'+cardId);
-  if(sel){sel.style.borderColor='var(--teal)';sel.style.background='rgba(0,212,177,.08)';}
-  if(method==='QRIS'){
-    const d=document.getElementById('pay-detail-qris');if(d)d.style.display='block';
-    const qc=document.getElementById('pay-qris-content');
-    if(qc){qc.innerHTML=qrisUrl?'<img src="'+qrisUrl+'" style="width:100%;max-width:180px;border-radius:8px;margin:6px auto;display:block"/><div style="text-align:center;font-size:11px;color:var(--muted)">Scan QR di atas</div>':'<div style="font-size:12px;color:var(--muted)">QR Code dikirim via WhatsApp setelah order</div>';}
-  } else {
-    const d=document.getElementById('pay-detail-transfer');if(d)d.style.display='block';
-    const bc=document.getElementById('pay-bank-content');
-    if(bc){bc.innerHTML=bankNama||bankRekening?'<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted);font-size:11px">Bank</span><span style="font-weight:700">'+bankNama+'</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted);font-size:11px">No. Rekening</span><span style="font-weight:700;font-family:monospace;letter-spacing:1px">'+bankRekening+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:11px">Atas Nama</span><span style="font-weight:600">'+bankAtasNama+'</span></div>':'<div style="font-size:12px;color:var(--muted)">Info rekening dikonfirmasi via WhatsApp</div>';}
-  }
-  const badge=document.getElementById('pay-selected-badge');const label=document.getElementById('pay-selected-label');
-  if(badge&&label){badge.style.display='block';label.textContent=method;}
+  const badge=document.getElementById('payBadge');
+  const label=document.getElementById('payBadgeLabel');
+  if(badge)badge.classList.add('show');
+  if(label)label.textContent=method;
 }
 
 async function sendOrder(){
@@ -546,47 +905,44 @@ async function sendOrder(){
   const gym=document.getElementById('buyerGym')?.value.trim();
   const address=document.getElementById('buyerAddress')?.value.trim();
   const note=document.getElementById('buyerNote')?.value.trim();
-  const payment=selectedPayment;
-  if(!name){showToast('⚠️ Masukkan nama kamu!');return;}
-  if(!phone){showToast('⚠️ Masukkan nomor WA kamu!');return;}
-  if(!payment){showToast('⚠️ Pilih metode pembayaran dulu!');return;}
+  if(!name){showToast('⚠ MASUKKAN NAMA KAMU');return;}
+  if(!phone){showToast('⚠ MASUKKAN NOMOR WA');return;}
+  if(!selectedPayment){showToast('⚠ PILIH METODE BAYAR');return;}
   const items=Object.values(cart).filter(c=>c.qty>0);
-  if(!items.length){showToast('⚠️ Pesanan kosong!');return;}
+  if(!items.length){showToast('⚠ CART KOSONG');return;}
   const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
-  const produkText=items.map(c=>`${c.product.brand} ${c.product.nama} x${c.qty}`).join(', ');
+  const produkText=items.map(c=>c.product.brand+' '+c.product.nama+' x'+c.qty).join(', ');
   try{
     await sb.from('orders').insert([{
       customer_nama:name,produk:produkText,total,status:'Pending',
-      catatan:`WA: ${phone}${gym?' | Gym: '+gym:''}${address?' | Alamat: '+address:''}${payment?' | Bayar: '+payment:''}${note?' | Note: '+note:''}`
+      catatan:'WA: '+phone+(gym?' | Gym: '+gym:'')+(address?' | Alamat: '+address:'')+(selectedPayment?' | Bayar: '+selectedPayment:'')+(note?' | Note: '+note:'')
     }]);
-  }catch(e){console.log('Order save:',e);}
-  const itemsText=items.map(c=>`  • *${c.product.brand} ${c.product.nama}*\n    ${c.qty} unit × ${fmt(c.product.harga||0)} = *${fmt((c.product.harga||0)*c.qty)}*`).join('\n');
-  const msg=`🏋️ *PESANAN BARU — FINDEST SPORT*\n\n👤 *Nama:* ${name}\n📱 *WA:* ${phone}${gym?'\n🏪 *Gym/Outlet:* '+gym:''}${address?'\n📍 *Alamat:* '+address:''}\n💳 *Pembayaran:* ${payment}\n\n━━━━━━━━━━━━━━━━\n🛒 *DETAIL PESANAN:*\n${itemsText}\n━━━━━━━━━━━━━━━━\n💰 *TOTAL: ${fmt(total)}*${note?'\n\n📝 *Catatan:* '+note:''}\n\n_via Findest Sport Digital Catalog_`;
-  if(salesWA){
-    window.open(`https://wa.me/${salesWA}?text=${encodeURIComponent(msg)}','_blank`);
-  }else{
-    try{await navigator.clipboard.writeText(msg);showToast('📋 Pesanan di-copy! (Nomor WA belum diset)');}
-    catch(e){alert(msg);}
-    return;
-  }
-  cart={};updateCartUI();closeModal('cartModal');renderProducts();showToast('✅ Order berhasil dikirim!');
+  }catch(e){console.log(e);}
+  const itemsText=items.map(c=>'  • *'+c.product.brand+' '+c.product.nama+'*\n    '+c.qty+' unit × '+fmt(c.product.harga||0)+' = *'+fmt((c.product.harga||0)*c.qty)+'*').join('\n');
+  const msg='🏋️ *PESANAN BARU — FINDEST SPORT*\n\n👤 *Nama:* '+name+'\n📱 *WA:* '+phone+(gym?'\n🏪 *Gym:* '+gym:'')+(address?'\n📍 *Alamat:* '+address:'')+'\n💳 *Pembayaran:* '+selectedPayment+'\n\n━━━━━━━━━━━━━━━━\n🛒 *DETAIL PESANAN:*\n'+itemsText+'\n━━━━━━━━━━━━━━━━\n💰 *TOTAL: '+fmt(total)+'*'+(note?'\n\n📝 *Catatan:* '+note:'')+'\n\n_via Findest Sport Digital Catalog_';
+  if(salesWA){window.open('https://wa.me/'+salesWA+'?text='+encodeURIComponent(msg),'_blank');}
+  else{try{await navigator.clipboard.writeText(msg);showToast('📋 ORDER DI-COPY!');}catch(e){alert(msg);}return;}
+  cart={};updateCartUI();closeModal('cartModal');renderProducts();showToast('✓ ORDER BERHASIL DIKIRIM!');
 }
 
+// ════════════════════════════════════════════
+// VIDEO
+// ════════════════════════════════════════════
 function openVideo(url){
   let embed=url;
   const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-  if(yt)embed=`https://www.youtube.com/embed/${yt[1]}?autoplay=1`;
+  if(yt)embed='https://www.youtube.com/embed/'+yt[1]+'?autoplay=1';
   document.getElementById('videoFrame').src=embed;
-  document.getElementById('videoOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.getElementById('videoOv').classList.add('open');
 }
-
 function closeVideo(){
+  document.getElementById('videoOv').classList.remove('open');
   document.getElementById('videoFrame').src='';
-  document.getElementById('videoOverlay').classList.remove('open');
-  document.body.style.overflow='';
 }
 
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
 let toastTimer;
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -595,438 +951,24 @@ function showToast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-
 // ════════════════════════════════════════════
-// TEXT SCRAMBLE — Loading Screen
+// START
 // ════════════════════════════════════════════
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
-function scrambleText(el, target, duration=800) {
-  const start = Date.now();
-  const interval = setInterval(() => {
-    const elapsed = Date.now() - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const revealIdx = Math.floor(progress * target.length);
-    el.textContent = target.split('').map((c, i) => {
-      if(c === ' ') return ' ';
-      if(i < revealIdx) return target[i];
-      return CHARS[Math.floor(Math.random() * CHARS.length)];
-    }).join('');
-    if(progress >= 1) { el.textContent = target; clearInterval(interval); }
-  }, 40);
-}
-
-// Start scramble on load
-scrambleText(document.getElementById('scramLogo'), 'FINDEST', 1200);
-setTimeout(() => scrambleText(document.getElementById('scramSub'), 'SPORT SUPPLEMENT', 1000), 300);
-
-// ════════════════════════════════════════════
-// THREE.JS ROBOT HERO
-// ════════════════════════════════════════════
-function initRobot() {
-  const canvas = document.getElementById('heroCanvas');
-  if(!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.set(0, 0.5, 5);
-
-  function resizeRobot() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+runLoader(async()=>{
+  // Hide loader
+  const loader=document.getElementById('loader');
+  if(gsap){
+    gsap.to(loader,{opacity:0,duration:.5,onComplete:()=>loader.style.display='none'});
+  } else {
+    loader.style.display='none';
   }
-  resizeRobot();
-  window.addEventListener('resize', resizeRobot);
-
-  // Lights
-  scene.add(new THREE.AmbientLight(0x00D4B1, 0.5));
-  const dir = new THREE.DirectionalLight(0x00ff88, 1.5);
-  dir.position.set(2, 4, 3);
-  scene.add(dir);
-  const rim = new THREE.DirectionalLight(0x0088ff, 0.8);
-  rim.position.set(-3, 1, -2);
-  scene.add(rim);
-  const bot = new THREE.DirectionalLight(0x00D4B1, 0.3);
-  bot.position.set(0, -3, 1);
-  scene.add(bot);
-
-  // Materials
-  const M = {
-    body: new THREE.MeshPhongMaterial({color:0x0d2a1f, shininess:100}),
-    accent: new THREE.MeshPhongMaterial({color:0x00D4B1, emissive:new THREE.Color(0x00D4B1).multiplyScalar(0.3), shininess:150}),
-    glow: new THREE.MeshPhongMaterial({color:0x00ff88, emissive:new THREE.Color(0x00ff88).multiplyScalar(0.9)}),
-    dark: new THREE.MeshPhongMaterial({color:0x061a10, shininess:80}),
-    gold: new THREE.MeshPhongMaterial({color:0xF5A623, emissive:new THREE.Color(0xF5A623).multiplyScalar(0.3)}),
-  };
-
-  const B = (w,h,d,m) => new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
-  const C = (rt,rb,h,m) => new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,16), m);
-  const S = (r,m) => new THREE.Mesh(new THREE.SphereGeometry(r,16,12), m);
-
-  // Robot
-  const robot = new THREE.Group();
-  scene.add(robot);
-
-  // Torso
-  const torso = B(1.0,1.3,0.65, M.body);
-  robot.add(torso);
-
-  // Chest panel
-  const chest = B(0.65,0.55,0.06, M.accent);
-  chest.position.z = 0.36;
-  chest.position.y = 0.1;
-  robot.add(chest);
-
-  // Chest glow lines
-  for(let i=-1;i<=1;i+=2) {
-    const line = B(0.45,0.04,0.04, M.glow);
-    line.position.set(0, i*0.12, 0.38);
-    robot.add(line);
-  }
-
-  // Core orb
-  const orb = S(0.1, M.glow);
-  orb.position.set(0, 0.1, 0.38);
-  robot.add(orb);
-
-  // Shoulder pads
-  for(let x of [-0.65,0.65]) {
-    const pad = B(0.22,0.22,0.22, M.accent);
-    pad.position.set(x, 0.65, 0);
-    robot.add(pad);
-  }
-
-  // Head group
-  const head = new THREE.Group();
-  head.position.y = 0.9;
-  const headBox = B(0.8,0.7,0.65, M.body);
-  head.add(headBox);
-
-  // Visor
-  const visor = B(0.6,0.22,0.06, M.dark);
-  visor.position.set(0, 0.06, 0.36);
-  head.add(visor);
-
-  // Eyes
-  for(let x of [-0.16,0.16]) {
-    const eye = S(0.08, M.glow);
-    eye.position.set(x, 0.06, 0.38);
-    head.add(eye);
-
-    // Eye glow ring
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(0.1,0.02,8,20),
-      new THREE.MeshPhongMaterial({color:0x00ff88, emissive:new THREE.Color(0x00ff88).multiplyScalar(0.5)})
-    );
-    ring.position.set(x, 0.06, 0.36);
-    ring.rotation.x = Math.PI/2;
-    head.add(ring);
-  }
-
-  // Mouth bar
-  const mouth = B(0.35,0.04,0.04, M.accent);
-  mouth.position.set(0, -0.12, 0.36);
-  head.add(mouth);
-
-  // Antenna
-  const antStem = C(0.03,0.03,0.2, M.dark);
-  antStem.position.set(0,0.5,0);
-  head.add(antStem);
-  const antTip = S(0.07, M.glow);
-  antTip.position.set(0,0.62,0);
-  head.add(antTip);
-
-  // Ear details
-  for(let x of [-0.44,0.44]) {
-    const ear = B(0.08,0.25,0.1, M.accent);
-    ear.position.set(x, 0, 0);
-    head.add(ear);
-  }
-
-  robot.add(head);
-
-  // Neck
-  const neck = C(0.15,0.18,0.18, M.dark);
-  neck.position.y = 0.72;
-  robot.add(neck);
-
-  // Arms
-  const leftArm = new THREE.Group();
-  leftArm.position.set(-0.7, 0.3, 0);
-  const laUpper = C(0.13,0.15,0.5, M.body);
-  laUpper.position.y = -0.25;
-  leftArm.add(laUpper);
-  const laJoint = S(0.14, M.accent);
-  leftArm.add(laJoint);
-  const laLower = C(0.11,0.13,0.45, M.dark);
-  laLower.position.y = -0.57;
-  leftArm.add(laLower);
-  const laHand = B(0.22,0.18,0.18, M.accent);
-  laHand.position.y = -0.85;
-  leftArm.add(laHand);
-  // Fingers
-  for(let i=0;i<3;i++) {
-    const f = B(0.05,0.12,0.05, M.dark);
-    f.position.set((i-1)*0.07, -0.97, 0);
-    leftArm.add(f);
-  }
-  robot.add(leftArm);
-
-  const rightArm = new THREE.Group();
-  rightArm.position.set(0.7, 0.3, 0);
-  const raUpper = C(0.13,0.15,0.5, M.body);
-  raUpper.position.y = -0.25;
-  rightArm.add(raUpper);
-  const raJoint = S(0.14, M.accent);
-  rightArm.add(raJoint);
-  const raLower = C(0.11,0.13,0.45, M.dark);
-  raLower.position.y = -0.57;
-  rightArm.add(raLower);
-  const raHand = B(0.22,0.18,0.18, M.accent);
-  raHand.position.y = -0.85;
-  rightArm.add(raHand);
-  for(let i=0;i<3;i++) {
-    const f = B(0.05,0.12,0.05, M.dark);
-    f.position.set((i-1)*0.07, -0.97, 0);
-    rightArm.add(f);
-  }
-  robot.add(rightArm);
-
-  // Hip
-  const hip = B(0.85,0.22,0.55, M.dark);
-  hip.position.y = -0.76;
-  robot.add(hip);
-
-  // Legs
-  for(let [x,side] of [[-0.26,'L'],[0.26,'R']]) {
-    const leg = new THREE.Group();
-    leg.position.set(x, -0.97, 0);
-    const upper = C(0.17,0.15,0.42, M.body);
-    upper.position.y = -0.21;
-    leg.add(upper);
-    const knee = S(0.16, M.accent);
-    leg.add(knee);
-    const lower = C(0.14,0.16,0.4, M.dark);
-    lower.position.y = -0.45;
-    leg.add(lower);
-    const foot = B(0.22,0.12,0.38, M.body);
-    foot.position.set(0.02, -0.68, 0.06);
-    leg.add(foot);
-    // Knee detail
-    const kd = B(0.12,0.06,0.06, M.glow);
-    kd.position.y = -0.03;
-    leg.add(kd);
-    robot.add(leg);
-  }
-
-  // Waist details
-  for(let i=-1;i<=1;i+=2) {
-    const wd = B(0.08,0.08,0.08, M.glow);
-    wd.position.set(i*0.35, -0.68, 0.3);
-    robot.add(wd);
-  }
-
-  // Floating particles
-  const pgeo = new THREE.BufferGeometry();
-  const pcount = 80;
-  const ppos = new Float32Array(pcount*3);
-  for(let i=0;i<pcount;i++) {
-    ppos[i*3] = (Math.random()-0.5)*8;
-    ppos[i*3+1] = (Math.random()-0.5)*6;
-    ppos[i*3+2] = (Math.random()-0.5)*4 - 1;
-  }
-  pgeo.setAttribute('position', new THREE.BufferAttribute(ppos,3));
-  const pmat = new THREE.PointsMaterial({color:0x00D4B1, size:0.05, transparent:true, opacity:0.5});
-  const particles = new THREE.Points(pgeo, pmat);
-  scene.add(particles);
-
-  // Grid floor
-  const grid = new THREE.GridHelper(10, 20, 0x00D4B1, 0x0d2a1f);
-  grid.position.y = -1.8;
-  grid.material.transparent = true;
-  grid.material.opacity = 0.3;
-  scene.add(grid);
-
-  robot.position.set(0.8, -0.2, 0);
-  robot.scale.setScalar(0.85);
-
-  // Entry animation with GSAP
-  gsap.from(robot.position, {y:-3, duration:1.2, ease:'elastic.out(1,0.5)', delay:0.5});
-  gsap.from(robot.rotation, {y: Math.PI*2, duration:1.5, ease:'power3.out', delay:0.5});
-
-  let t = 0;
-  function animLoop() {
-    requestAnimationFrame(animLoop);
-    t += 0.012;
-    // Body float
-    robot.position.y = -0.2 + Math.sin(t*0.7)*0.08;
-    robot.rotation.y = -0.2 + Math.sin(t*0.3)*0.12;
-    // Head look
-    head.rotation.y = Math.sin(t*0.4)*0.25;
-    head.rotation.x = Math.sin(t*0.5)*0.08;
-    // Arms swing
-    leftArm.rotation.z = -0.15 + Math.sin(t*1.1)*0.2;
-    leftArm.rotation.x = Math.sin(t*0.7)*0.12;
-    rightArm.rotation.z = 0.15 - Math.sin(t*1.1)*0.2;
-    rightArm.rotation.x = -Math.sin(t*0.7)*0.12;
-    // Antenna pulse
-    antTip.scale.setScalar(0.8 + Math.sin(t*4)*0.3);
-    orb.scale.setScalar(0.9 + Math.sin(t*3)*0.2);
-    // Particles rotate
-    particles.rotation.y = t*0.03;
-    grid.position.z = (t*0.5) % 0.5;
-    renderer.render(scene, camera);
-  }
-  animLoop();
-}
-
-// ════════════════════════════════════════════
-// GSAP HERO INTRO
-// ════════════════════════════════════════════
-function runHeroIntro() {
-  if(typeof gsap === 'undefined') return;
-  const tl = gsap.timeline({delay:0.3});
-  tl.to('#heroLogo', {opacity:1, y:0, duration:0.5, ease:'power2.out'})
-    .fromTo(['#hw1','#hw2','#hw3'],
-      {y:'100%', opacity:0},
-      {y:'0%', opacity:1, duration:0.5, stagger:0.08, ease:'back.out(1.7)'},
-      '-=0.2'
-    )
-    .to('#heroDesc', {opacity:1, y:0, duration:0.4}, '-=0.1')
-    .to('#heroBadges', {opacity:1, y:0, duration:0.4}, '-=0.2')
-    .to('#statsBar', {opacity:1, y:0, duration:0.4}, '-=0.1')
-    .call(animateStats);
-}
-
-function animateStats() {
-  if(typeof gsap === 'undefined') return;
-  [{id:'sn1',end:67},{id:'sn2',end:103},{id:'sn3',end:18}].forEach(item => {
-    gsap.to({v:0}, {v:item.end, duration:1.5, ease:'power2.out',
-      onUpdate: function(){ const el=document.getElementById(item.id); if(el) el.textContent=Math.round(this.targets()[0].v); }
-    });
-  });
-}
-
-// ════════════════════════════════════════════
-// PRODUCT SLIDER (Featured section)
-// ════════════════════════════════════════════
-let sliderPos = 0;
-let sliderCards = [];
-let sliderMax = 0;
-
-function initSlider(products) {
-  const featured = products.filter(p => p.status === 'Aktif').slice(0,8);
-  if(featured.length < 3) return;
-
-  const sliderHTML = `
-    <div class="section-label reveal-left" id="sliderSection" style="opacity:0">PRODUK PILIHAN</div>
-    <div class="slider-wrap">
-      <div class="slider-track-outer">
-        <div class="slider-track" id="sliderTrack">
-          ${featured.map(p => {
-            const emoji = p.kategori==='Protein'?'💪':p.kategori==='Pre-Workout'?'⚡':p.kategori==='Mass Gainer'?'📈':p.kategori==='Creatine'?'🔥':p.kategori==='Amino'?'🔬':'🏆';
-            const bg = p.brand==='ON'?'#0a1f0a':p.brand==='BSN'?'#0a0a1f':'#0a1a1f';
-            return '<div class="product-card" style="flex:0 0 150px;animation:none" onclick="openProduct('+p.id+')">' +
-              '<div class="card-img-wrap"><div class="card-img" style="background:linear-gradient(135deg,'+bg+',#080B0F)">'+emoji+'</div>' +
-              '<div class="card-badge-brand">'+p.brand+'</div></div>' +
-              '<div class="card-body"><div class="card-name">'+p.nama+'</div>' +
-              '<div class="card-price">'+(p.harga?'Rp '+parseInt(p.harga).toLocaleString('id-ID'):'-')+'</div>' +
-              '<button class="add-btn" onclick="event.stopPropagation();quickAdd(event,'+p.id+')">+ Tambah</button>' +
-              '</div></div>';
-          }).join('')}
-        </div>
-      </div>
-      <div class="slider-nav-row">
-        <div class="slider-dots" id="sliderDots"></div>
-        <div class="slider-arrows">
-          <button class="sarr" onclick="slideMove(-1)">‹</button>
-          <button class="sarr" onclick="slideMove(1)">›</button>
-        </div>
-      </div>
-    </div>`;
-
-  const grid = document.getElementById('productGrid');
-  grid.insertAdjacentHTML('beforebegin', sliderHTML);
-
-  sliderCards = document.querySelectorAll('#sliderTrack .product-card');
-  sliderMax = Math.max(0, sliderCards.length - 2);
-
-  const dotsEl = document.getElementById('sliderDots');
-  for(let i=0;i<=sliderMax;i++) {
-    const d = document.createElement('div');
-    d.className = 'sdot'+(i===0?' active':'');
-    d.onclick = () => goSlide(i);
-    dotsEl.appendChild(d);
-  }
-
-  // Animate slider section in
-  if(typeof gsap !== 'undefined') {
-    gsap.to('#sliderSection', {opacity:1, x:0, duration:0.5, delay:0.2});
-    gsap.fromTo(sliderCards,
-      {opacity:0, x:30},
-      {opacity:1, x:0, duration:0.4, stagger:0.06, delay:0.3, ease:'back.out(1.5)'}
-    );
-  }
-}
-
-function goSlide(idx) {
-  sliderPos = Math.max(0, Math.min(idx, sliderMax));
-  const w = 150 + 10;
-  if(typeof gsap !== 'undefined') {
-    gsap.to('#sliderTrack', {x: -sliderPos*w, duration:0.5, ease:'power3.out'});
-  }
-  document.querySelectorAll('.sdot').forEach((d,i) => d.classList.toggle('active', i===sliderPos));
-}
-
-function slideMove(dir) { goSlide(sliderPos + dir); }
-
-// ════════════════════════════════════════════
-// SCROLL REVEAL
-// ════════════════════════════════════════════
-function initScrollReveal() {
-  if(typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-  gsap.registerPlugin(ScrollTrigger);
-
-  gsap.utils.toArray('.product-card').forEach((el, i) => {
-    gsap.fromTo(el,
-      {opacity:0, y:20},
-      {opacity:1, y:0, duration:0.4, delay: (i%4)*0.06,
-        scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}
-      }
-    );
-  });
-}
-
-// ════════════════════════════════════════════
-// TOUCH SWIPE for slider
-// ════════════════════════════════════════════
-let touchStartX = 0;
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-document.addEventListener('touchend', e => {
-  const diff = touchStartX - e.changedTouches[0].clientX;
-  if(Math.abs(diff) > 50 && document.getElementById('sliderTrack')) {
-    slideMove(diff > 0 ? 1 : -1);
-  }
-});
-
-// Run 3D after init completes
-async function run3D() {
+  // Load data
   await init();
-  setTimeout(() => {
-    initRobot();
-    runHeroIntro();
-    if(allProducts && allProducts.length > 0) {
-      initSlider(allProducts);
-      setTimeout(initScrollReveal, 600);
-    }
-    animateStats();
-  }, 200);
-}
-
-run3D();
+  // Init 3D
+  initRobot();
+  // Hero intro
+  heroIntro();
+});
 </script>
 </body>
 </html>
