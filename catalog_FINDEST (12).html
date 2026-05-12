@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Findest Sport — Catalog</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060910;--bg2:#0b1120;--surface:#0f1928;--surface2:#131f30;--border:#1c2d45;--teal:#00D4B1;--gold:#F5A623;--red:#FF3B5C;--text:#eef2ff;--muted:#4a6280}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+.hero{background:linear-gradient(135deg,#060910 0%,#0a1a2e 50%,#060910 100%);padding:32px 16px 28px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(0,212,177,.08) 0%,transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,177,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,177,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.hero-eyebrow{font-family:'Orbitron',monospace;font-size:11px;color:var(--teal);letter-spacing:4px;margin-bottom:16px;opacity:.7;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:16px;height:1px;background:var(--teal)}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,12vw,80px);line-height:.9;letter-spacing:2px;margin-bottom:12px}
+.hero-title .accent{color:transparent;-webkit-text-stroke:1.5px var(--teal)}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:16px;max-width:300px}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px}
+.badge.g{background:rgba(0,212,177,.1);border:1px solid rgba(0,212,177,.3);color:var(--teal)}
+.badge.y{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
+.stat{padding:14px 8px;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--teal)}
+.stat-l{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(6,9,16,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.topbar-logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--teal);letter-spacing:2px;flex-shrink:0}
+.search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;transition:border-color .2s}
+.search-wrap:focus-within{border-color:var(--teal)}
+.search-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+.search-wrap input::placeholder{color:var(--muted)}
+.cats{display:flex;gap:6px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--border);scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;padding:6px 14px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;letter-spacing:.5px}
+.cat-btn.active{background:var(--teal);border-color:var(--teal);color:#060910}
+.sec-head{padding:16px 14px 8px;display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;letter-spacing:2px}
+.sec-count{font-size:11px;color:var(--muted);font-family:'Orbitron',monospace}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 10px 120px}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:720px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;position:relative}
+.card:active{transform:scale(.96)}
+.card.in-cart{border-color:var(--teal)}
+.card-img{height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--surface2);position:relative;overflow:hidden}
+.card-img img{width:85%;height:85%;object-fit:contain}
+.brand-tag{position:absolute;top:6px;left:6px;font-size:9px;font-weight:700;letter-spacing:.5px;padding:2px 7px;border-radius:3px;font-family:'Orbitron',monospace}
+.brand-tag.ON{background:rgba(0,212,177,.15);color:var(--teal);border:1px solid rgba(0,212,177,.25)}
+.brand-tag.BSN{background:rgba(79,124,245,.15);color:#7fa8ff;border:1px solid rgba(79,124,245,.25)}
+.brand-tag.ISOPURE{background:rgba(255,59,92,.12);color:#ff8099;border:1px solid rgba(255,59,92,.25)}
+.stok-tag{position:absolute;top:6px;right:6px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:'Orbitron',monospace}
+.stok-tag.habis{background:rgba(255,59,92,.9);color:#fff}
+.stok-tag.terbatas{background:rgba(245,166,35,.9);color:#060910}
+.card-body{padding:10px}
+.card-kat{font-size:9px;color:var(--muted);letter-spacing:.5px;margin-bottom:3px;font-family:'Orbitron',monospace}
+.card-name{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:6px}
+.card-price{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--teal);margin-bottom:8px}
+.card-price.no-price{font-size:10px;color:var(--muted)}
+.add-btn{width:100%;padding:7px;background:transparent;border:1px solid var(--teal);color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:1px;border-radius:4px;transition:all .2s}
+.add-btn:hover,.add-btn.added{background:var(--teal);color:#060910}
+.add-btn:disabled{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.25);color:var(--red);cursor:not-allowed}
+.cart-fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120px);z-index:150;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--teal);color:#060910;padding:13px 24px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;white-space:nowrap;min-width:220px;border:none;font-family:'Inter',sans-serif;opacity:0}
+.cart-fab.show{transform:translateX(-50%) translateY(0);opacity:1}
+.fab-badge{background:#060910;color:var(--teal);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-family:'Orbitron',monospace}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{background:var(--bg2);border-top:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);position:relative}
+.sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.overlay.open .sheet{transform:translateY(0)}
+.drag{width:36px;height:3px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-body{padding:16px 18px 40px}
+.pm-img{height:200px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:72px;border-radius:10px;margin-bottom:16px;overflow:hidden;border:1px solid var(--border)}
+.pm-img img{width:100%;height:100%;object-fit:contain;padding:12px}
+.pm-brand{font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;margin-bottom:6px}
+.pm-brand.ON{color:var(--teal)}.pm-brand.BSN{color:#7fa8ff}.pm-brand.ISOPURE{color:#ff8099}
+.pm-name{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.pm-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.pm-price{font-family:'Orbitron',monospace;font-size:24px;font-weight:700;color:var(--teal);margin-bottom:18px}
+.qty-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.qty-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;cursor:pointer}
+.qty-num{font-size:20px;font-weight:700;font-family:'Orbitron',monospace;color:var(--teal);min-width:28px;text-align:center}
+.pm-add{width:100%;padding:14px;background:var(--teal);color:#060910;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:2px;border-radius:6px}
+.ci{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ci-thumb{width:44px;height:44px;border-radius:6px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;border:1px solid var(--border)}
+.ci-thumb img{width:100%;height:100%;object-fit:contain;padding:4px}
+.ci-name{font-size:12px;font-weight:600;line-height:1.3}
+.ci-brand{font-size:9px;color:var(--muted);letter-spacing:1px;font-family:'Orbitron',monospace;margin-top:2px}
+.ci-price{font-size:12px;color:var(--teal);font-weight:700;font-family:'Orbitron',monospace;margin-top:3px}
+.ci-qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ciq{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ciq-n{font-size:13px;font-weight:700;font-family:'Orbitron',monospace;min-width:22px;text-align:center;color:var(--teal)}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--border);margin-top:6px}
+.total-val{font-family:'Orbitron',monospace;font-size:20px;color:var(--teal);font-weight:700}
+.f-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;margin:16px 0 10px;color:var(--text)}
+.fi{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:8px;transition:border-color .2s}
+.fi:focus{border-color:var(--teal)}
+.fi::placeholder{color:var(--muted)}
+textarea.fi{resize:none}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pay-card{border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;text-align:center;background:var(--surface);transition:all .2s}
+.pay-card.sel{border-color:var(--teal);background:rgba(0,212,177,.06)}
+.pay-icon{font-size:26px;margin-bottom:6px}
+.pay-label{font-size:12px;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:.5px}
+.pay-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.pay-info{padding:12px;background:var(--surface);border:1px solid var(--teal);border-radius:6px;margin-bottom:10px;display:none}
+.pay-info.show{display:block}
+.pay-info-label{font-size:10px;color:var(--teal);font-family:'Orbitron',monospace;letter-spacing:1px;margin-bottom:8px}
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.pay-row span{color:var(--muted);font-size:11px}
+.pay-row b{font-family:'Orbitron',monospace;letter-spacing:.5px}
+.checkout-btn{width:100%;margin-top:12px;padding:15px;background:var(--teal);color:#060910;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:2px;border-radius:6px}
+.checkout-btn:active{transform:scale(.98)}
+.checkout-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--teal);border-radius:6px;padding:10px 18px;font-size:12px;z-index:999;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;font-family:'Orbitron',monospace;letter-spacing:.5px;color:var(--teal)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-state{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state .ei{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px}
+.video-ov{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column}
+.video-ov.open{display:flex}
+.video-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;z-index:1}
+.video-ov iframe{flex:1;border:none}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">EXCLUSIVE DISTRIBUTOR — BALI</div>
+  <h1 class="hero-title">FUEL YOUR<br><span class="accent">POTENTIAL.</span></h1>
+  <p class="hero-sub">Suplemen premium ON, BSN & ISOPURE.<br>100% authentic · Harga distributor.</p>
+  <div class="hero-badges">
+    <span class="badge g">✓ 100% Original</span>
+    <span class="badge g">✓ Exclusive ON Bali</span>
+    <span class="badge y">⚡ Order via WhatsApp</span>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-n" id="sn1">—</div><div class="stat-l">Produk SKU</div></div>
+  <div class="stat"><div class="stat-n">103</div><div class="stat-l">Customer Aktif</div></div>
+  <div class="stat"><div class="stat-n">18</div><div class="stat-l">Outlet Bali</div></div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-logo">FS</div>
+  <div class="search-wrap">
+    <span style="color:var(--muted);font-size:15px">⌕</span>
+    <input type="text" id="searchInput" placeholder="Cari produk, brand, flavor..." oninput="filterProducts()">
+    <span id="clearBtn" style="color:var(--muted);cursor:pointer;display:none;font-size:14px" onclick="clearSearch()">✕</span>
+  </div>
+</div>
+
+<div class="cats">
+  <button class="cat-btn active" onclick="setCat('all',this)">ALL</button>
+  <button class="cat-btn" onclick="setCat('ON',this)">ON</button>
+  <button class="cat-btn" onclick="setCat('BSN',this)">BSN</button>
+  <button class="cat-btn" onclick="setCat('ISOPURE',this)">ISOPURE</button>
+  <button class="cat-btn" onclick="setCat('Protein',this)">PROTEIN</button>
+  <button class="cat-btn" onclick="setCat('Mass Gainer',this)">GAINER</button>
+  <button class="cat-btn" onclick="setCat('Creatine',this)">CREATINE</button>
+  <button class="cat-btn" onclick="setCat('Amino',this)">AMINO</button>
+  <button class="cat-btn" onclick="setCat('Pre-Workout',this)">PRE-WO</button>
+  <button class="cat-btn" onclick="setCat('Vitamin',this)">VITAMIN</button>
+</div>
+
+<div class="sec-head">
+  <div class="sec-title" id="secLabel">ALL PRODUCTS</div>
+  <div class="sec-count" id="secCount"></div>
+</div>
+<div class="grid" id="productGrid">
+  <div class="empty-state"><div class="ei">⏳</div><p>MEMUAT PRODUK...</p></div>
+</div>
+
+<button class="cart-fab" id="cartFab" onclick="openCart()">
+  <span>🛒 PESANAN</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="fabTotal" style="font-size:11px;font-family:'Orbitron',monospace">Rp 0</span>
+    <div class="fab-badge" id="fabCount">0</div>
+  </div>
+</button>
+
+<div class="overlay" id="prodModal" onclick="bgClose(event,'prodModal')">
+  <div class="sheet"><div class="drag"></div><div class="modal-body" id="prodContent"></div></div>
+</div>
+<div class="overlay" id="cartModal" onclick="bgClose(event,'cartModal')">
+  <div class="sheet"><div class="drag"></div><div class="modal-body" id="cartContent"></div></div>
+</div>
+<div class="video-ov" id="videoOv">
+  <button class="video-close" onclick="closeVideo()">✕</button>
+  <iframe id="videoFrame" allow="autoplay"></iframe>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB=supabase.createClient('https://wuejoxgbtvmlrriwlofk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1ZWpveGdidHZtbHJyaXdsb2ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjY1NTQsImV4cCI6MjA5Mjg0MjU1NH0.nq0xlsuXeJNXtb8SisPQ3Ml5fXNy2vguVRJ8pNFGai0');
+let products=[],cart={},activeCat='all',searchQ='',modalQty=1,selPayment='';
+let salesWA='',salesName='Findest Sport',bankNama='',bankRekening='',bankAtasNama='',qrisUrl='';
+const fmt=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const EM={ON:'🏆',BSN:'💪',ISOPURE:'❄️'};
+
+function convertFotoUrl(url){
+  if(!url) return '';
+  // Google Drive - pakai thumbnail format (paling reliable, no CORS)
+  let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w400';
+  let m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if(m2) return 'https://drive.google.com/thumbnail?id='+m2[1]+'&sz=w400';
+  // Jika bukan Google Drive, return as is
+  return url;
+}
+
+async function init(){
+  try{
+    const[cfg,prods]=await Promise.all([
+      SB.from('config').select('key,value'),
+      SB.from('products').select('id,nama,brand,kategori,harga,foto_url,deskripsi,status,video_url,stok').eq('status','Aktif').order('brand').order('nama')
+    ]);
+    if(cfg.data)cfg.data.forEach(r=>{
+      if(r.key==='catalog_wa'){let wa=(r.value||'').replace(/[\s\-]/g,'');if(wa.startsWith('+62'))wa=wa.slice(1);else if(wa.startsWith('08'))wa='62'+wa.slice(1);else if(wa.startsWith('8')&&!wa.startsWith('62'))wa='62'+wa;salesWA=wa;}
+      if(r.key==='catalog_sales_name')salesName=r.value||'Findest Sport';
+      if(r.key==='bank_nama')bankNama=r.value||'';
+      if(r.key==='bank_rekening')bankRekening=r.value||'';
+      if(r.key==='bank_atas_nama')bankAtasNama=r.value||'';
+      if(r.key==='qris_url')qrisUrl=r.value||'';
+    });
+    products=prods.data||[];
+    document.getElementById('sn1').textContent=products.length;
+    render();
+  }catch(e){
+    console.error(e);
+    document.getElementById('productGrid').innerHTML='<div class="empty-state"><div class="ei">⚠️</div><p>GAGAL MEMUAT — CEK KONEKSI</p></div>';
+  }
+}
+
+function getFiltered(){
+  return products.filter(p=>{
+    const mC=activeCat==='all'||p.brand===activeCat||p.kategori===activeCat;
+    const mQ=!searchQ||p.nama.toLowerCase().includes(searchQ)||p.brand.toLowerCase().includes(searchQ)||(p.kategori||'').toLowerCase().includes(searchQ);
+    return mC&&mQ;
+  });
+}
+
+function render(){
+  const list=getFiltered();
+  document.getElementById('secLabel').textContent=activeCat==='all'?'ALL PRODUCTS':activeCat.toUpperCase();
+  document.getElementById('secCount').textContent=list.length+' produk';
+  const grid=document.getElementById('productGrid');
+  if(!list.length){grid.innerHTML='<div class="empty-state"><div class="ei">🔍</div><p>PRODUK TIDAK DITEMUKAN</p></div>';return;}
+  grid.innerHTML=list.map(p=>{
+    const stok=p.stok!=null?parseInt(p.stok):null;
+    const habis=stok===0;
+    const terbatas=stok!=null&&stok>0&&stok<=10;
+    const inCart=!!cart[p.id];
+    const em=EM[p.brand]||'📦';
+    return `<div class="card${inCart?' in-cart':''}" onclick="openProd(${p.id})">
+      <div class="card-img">
+        ${p.foto_url?`<img src="${convertFotoUrl(p.foto_url)}" onerror="this.outerHTML='<span style=font-size:48px>${em}</span>'">`:`<span style="font-size:48px">${em}</span>`}
+        <div class="brand-tag ${p.brand}">${p.brand}</div>
+        ${habis?'<div class="stok-tag habis">HABIS</div>':terbatas?`<div class="stok-tag terbatas">SISA ${stok}</div>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-kat">${p.kategori||''}</div>
+        <div class="card-name">${p.nama}</div>
+        <div class="card-price${p.harga?'':' no-price'}">${p.harga?fmt(p.harga):'Hubungi Sales'}</div>
+        <button class="add-btn${inCart?' added':''}" ${habis?'disabled':''} onclick="event.stopPropagation();quickAdd(${p.id})">
+          ${habis?'HABIS':inCart?'✓ ADDED':'+ ADD'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setCat(cat,btn){activeCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function filterProducts(){searchQ=document.getElementById('searchInput').value.trim().toLowerCase();document.getElementById('clearBtn').style.display=searchQ?'block':'none';render();}
+function clearSearch(){searchQ='';document.getElementById('searchInput').value='';document.getElementById('clearBtn').style.display='none';render();}
+
+function quickAdd(id){
+  const p=products.find(x=>x.id===id);
+  if(!p||p.stok===0)return;
+  cart[id]=cart[id]?{product:p,qty:cart[id].qty+1}:{product:p,qty:1};
+  updateFab();render();
+  showToast('+ '+p.nama.substring(0,22)+'...');
+}
+
+function changeCartQty(id,d){
+  if(!cart[id])return;
+  cart[id].qty+=d;
+  if(cart[id].qty<=0)delete cart[id];
+  updateFab();openCart();
+}
+
+function updateFab(){
+  const items=Object.values(cart);
+  const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
+  const count=items.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('fabCount').textContent=count;
+  document.getElementById('fabTotal').textContent=fmt(total);
+  const fab=document.getElementById('cartFab');
+  if(count>0)fab.classList.add('show');else fab.classList.remove('show');
+}
+
+function openOverlay(id){document.getElementById(id).classList.add('open');}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+function bgClose(e,id){if(e.target.classList.contains('overlay'))closeOverlay(id);}
+
+function openProd(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  modalQty=1;
+  const stok=p.stok!=null?parseInt(p.stok):null;
+  const habis=stok===0,terbatas=stok!=null&&stok>0&&stok<=10;
+  const em=EM[p.brand]||'📦',inCart=!!cart[id];
+  document.getElementById('prodContent').innerHTML=`
+    <div class="pm-img">${p.foto_url?`<img src="${convertFotoUrl(p.foto_url)}" onerror="this.outerHTML='<span style=font-size:72px>${em}</span>'">`:`<span style="font-size:72px">${em}</span>`}</div>
+    ${p.video_url?`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:14px" onclick="openVideo('${p.video_url}')">▶ Tonton Video Produk</div>`:''}
+    ${habis?`<div style="padding:10px;background:rgba(255,59,92,.08);border:1px solid var(--red);border-radius:6px;font-size:12px;color:var(--red);font-family:'Orbitron',monospace;margin-bottom:14px">❌ STOK HABIS</div>`:''}
+    ${terbatas&&!habis?`<div style="padding:8px 12px;background:rgba(245,166,35,.08);border:1px solid var(--gold);border-radius:6px;font-size:11px;color:var(--gold);font-family:'Orbitron',monospace;margin-bottom:12px">⚠ SISA ${stok} UNIT</div>`:''}
+    <div class="pm-brand ${p.brand}">${p.brand}</div>
+    <div class="pm-name">${p.nama}</div>
+    ${p.deskripsi?`<div class="pm-desc">${p.deskripsi}</div>`:''}
+    <div class="pm-price">${p.harga?fmt(p.harga):'Hubungi Sales'}</div>
+    ${!habis?`<div class="qty-row"><button class="qty-btn" onclick="chgQty(-1)">−</button><div class="qty-num" id="mqty">1</div><button class="qty-btn" onclick="chgQty(1)">+</button></div><button class="pm-add" onclick="addFromModal(${p.id})">${inCart?'✓ UPDATE PESANAN':'+ TAMBAH KE PESANAN'}</button>`:''}
+  `;
+  openOverlay('prodModal');
+}
+
+function chgQty(d){modalQty=Math.max(1,modalQty+d);const el=document.getElementById('mqty');if(el)el.textContent=modalQty;}
+
+function addFromModal(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  cart[id]={product:p,qty:modalQty};
+  updateFab();render();closeOverlay('prodModal');
+  showToast(`✓ ${p.nama.substring(0,20)}... x${modalQty}`);
+}
+
+function openCart(){
+  const items=Object.values(cart).filter(c=>c.qty>0);
+  if(!items.length){showToast('Cart kosong!');return;}
+  const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
+  document.getElementById('cartContent').innerHTML=`
+    <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:4px">PESANAN</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;font-family:'Orbitron',monospace">${items.length} PRODUK · ${items.reduce((s,c)=>s+c.qty,0)} UNIT</div>
+    ${items.map(c=>{const em=EM[c.product.brand]||'📦';return`<div class="ci"><div class="ci-thumb">${c.product.foto_url?`<img src="${convertFotoUrl(c.product.foto_url)}" onerror="this.outerHTML='${em}'">`:`${em}`}</div><div style="flex:1;min-width:0"><div class="ci-name">${c.product.nama}</div><div class="ci-brand">${c.product.brand}</div><div class="ci-price">${fmt((c.product.harga||0)*c.qty)}</div></div><div class="ci-qty"><button class="ciq" onclick="changeCartQty(${c.product.id},-1)">−</button><div class="ciq-n">${c.qty}</div><button class="ciq" onclick="changeCartQty(${c.product.id},1)">+</button></div></div>`;}).join('')}
+    <div class="total-row"><span style="font-family:'Orbitron',monospace;font-size:12px;letter-spacing:1px">TOTAL</span><div class="total-val">${fmt(total)}</div></div>
+    <div class="f-title">DATA PEMESAN</div>
+    <input class="fi" id="buyerName" placeholder="Nama lengkap *" type="text">
+    <input class="fi" id="buyerPhone" placeholder="No. WhatsApp *" type="tel">
+    <input class="fi" id="buyerGym" placeholder="Nama gym / outlet (opsional)" type="text">
+    <input class="fi" id="buyerAddress" placeholder="Alamat pengiriman (opsional)" type="text">
+    <textarea class="fi" id="buyerNote" placeholder="Catatan: flavor, ukuran, dll..." rows="2"></textarea>
+    <div class="f-title">METODE PEMBAYARAN</div>
+    <div class="pay-grid">
+      <div class="pay-card" id="pc-qris" onclick="selPay('QRIS')"><div class="pay-icon">💳</div><div class="pay-label">QRIS</div><div class="pay-sub">Scan & Pay</div></div>
+      <div class="pay-card" id="pc-transfer" onclick="selPay('Transfer Bank')"><div class="pay-icon">🏦</div><div class="pay-label">TRANSFER</div><div class="pay-sub">Via rekening</div></div>
+    </div>
+    <div class="pay-info" id="info-qris">
+      <div class="pay-info-label">💳 QRIS</div>
+      ${qrisUrl?`<img src="${qrisUrl}" style="width:100%;max-width:180px;border-radius:8px;margin:0 auto;display:block">`:`<div style="font-size:12px;color:var(--muted)">QR dikirim via WhatsApp setelah order</div>`}
+    </div>
+    <div class="pay-info" id="info-transfer">
+      <div class="pay-info-label">🏦 INFO TRANSFER</div>
+      ${bankNama||bankRekening?`<div class="pay-row"><span>Bank</span><b>${bankNama}</b></div><div class="pay-row"><span>Rekening</span><b>${bankRekening}</b></div><div class="pay-row"><span>Atas Nama</span><b>${bankAtasNama}</b></div>`:`<div style="font-size:12px;color:var(--muted)">Info rekening dikonfirmasi via WhatsApp</div>`}
+    </div>
+    <button class="checkout-btn" onclick="sendOrder()">📲 KIRIM ORDER VIA WHATSAPP</button>
+    <div class="checkout-hint">Sales kami balas dalam <strong style="color:var(--teal)">5–15 menit</strong> ⚡</div>
+  `;
+  selPayment='';
+  openOverlay('cartModal');
+}
+
+function selPay(method){
+  selPayment=method;
+  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById(method==='QRIS'?'pc-qris':'pc-transfer').classList.add('sel');
+  document.getElementById('info-qris').classList.toggle('show',method==='QRIS');
+  document.getElementById('info-transfer').classList.toggle('show',method==='Transfer Bank');
+}
+
+async function sendOrder(){
+  const name=document.getElementById('buyerName')?.value.trim();
+  const phone=document.getElementById('buyerPhone')?.value.trim();
+  const gym=document.getElementById('buyerGym')?.value.trim();
+  const address=document.getElementById('buyerAddress')?.value.trim();
+  const note=document.getElementById('buyerNote')?.value.trim();
+  if(!name){showToast('⚠ Masukkan nama kamu!');return;}
+  if(!phone){showToast('⚠ Masukkan nomor WA!');return;}
+  if(!selPayment){showToast('⚠ Pilih metode pembayaran!');return;}
+  const items=Object.values(cart).filter(c=>c.qty>0);
+  if(!items.length){showToast('⚠ Cart kosong!');return;}
+  const total=items.reduce((s,c)=>s+(c.product.harga||0)*c.qty,0);
+  const itemsText=items.map(c=>`  • *${c.product.brand} ${c.product.nama}*\n    ${c.qty} unit × ${fmt(c.product.harga||0)} = *${fmt((c.product.harga||0)*c.qty)}*`).join('\n');
+  const msg=`🏋️ *PESANAN BARU — FINDEST SPORT*\n\n👤 *Nama:* ${name}\n📱 *WA:* ${phone}${gym?'\n🏪 *Gym:* '+gym:''}${address?'\n📍 *Alamat:* '+address:''}\n💳 *Pembayaran:* ${selPayment}\n\n━━━━━━━━━━━━━━━━\n🛒 *DETAIL PESANAN:*\n${itemsText}\n━━━━━━━━━━━━━━━━\n💰 *TOTAL: ${fmt(total)}*${note?'\n\n📝 *Catatan:* '+note:''}\n\n_via Findest Sport Digital Catalog_`;
+  // Buka WA dulu SEBELUM await — hindari popup blocker!
+  if(salesWA){
+    window.open('https://wa.me/'+salesWA+'?text='+encodeURIComponent(msg),'_blank');
+  }else{
+    try{await navigator.clipboard.writeText(msg);showToast('📋 Order di-copy! (No WA belum diset)');}
+    catch(e){alert(msg);}
+    return;
+  }
+  // Background: simpan ke Supabase
+  try{
+    const produkText=items.map(c=>`${c.product.brand} ${c.product.nama} x${c.qty}`).join(', ');
+    await SB.from('orders').insert([{customer_nama:name,produk:produkText,total,status:'Pending',catatan:`WA: ${phone}${gym?' | Gym: '+gym:''}${address?' | Alamat: '+address:''}${selPayment?' | Bayar: '+selPayment:''}${note?' | Note: '+note:''}`}]);
+  }catch(e){console.log('Order save:',e);}
+  cart={};updateFab();closeOverlay('cartModal');render();
+  showToast('✅ Order berhasil dikirim!');
+}
+
+function openVideo(url){let e=url;const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);if(yt)e='https://www.youtube.com/embed/'+yt[1]+'?autoplay=1';document.getElementById('videoFrame').src=e;document.getElementById('videoOv').classList.add('open');}
+function closeVideo(){document.getElementById('videoOv').classList.remove('open');document.getElementById('videoFrame').src='';}
+
+let toastTimer;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);}
+
+// START
+init();
+</script>
+</body>
+</html>
