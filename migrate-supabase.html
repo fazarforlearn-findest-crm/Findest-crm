@@ -151,6 +151,7 @@ function generateCreateTable(tableName, rows) {
 
   for (const row of rows) {
     for (const [col, val] of Object.entries(row)) {
+      if (!columns[col]) columns[col] = null;
       if (val === null || val === undefined) continue;
       const type = inferType(val);
       if (!columns[col] || columns[col] === 'TEXT') {
