@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Findest Sport — CRM</title>
 <!-- ── PWA: installable to home screen, fullscreen native feel ── -->
-<meta name="theme-color" content="#0A0A0A">
+<meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,36 +42,36 @@
 <style>
 :root {
   /* ── HashiCorp black-canvas system ── */
-  --canvas:#0A0A0A; --bg:#0A0A0A;
-  --surface:#161619; --surface2:#1F1F23; --surface3:#29292E;
-  --surface-1:#161619; --surface-2:#1F1F23; --surface-3:#29292E;
-  /* Hairline borders — felt more than seen */
-  --border:rgba(178,182,189,0.10); --border-soft:rgba(178,182,189,0.06);
-  --hairline:rgba(178,182,189,0.10); --hairline-soft:rgba(178,182,189,0.06);
-  --inverse-canvas:#FFFFFF;
+  --canvas:#F7F7F8; --bg:#F7F7F8;
+  --surface:#FFFFFF; --surface2:#F1F1F3; --surface3:#E8E8EC;
+  --surface-1:#FFFFFF; --surface-2:#F1F1F3; --surface-3:#E8E8EC;
+  /* Hairline borders — clean and crisp */
+  --border:rgba(0,0,0,0.08); --border-soft:rgba(0,0,0,0.04);
+  --hairline:rgba(0,0,0,0.08); --hairline-soft:rgba(0,0,0,0.04);
+  --inverse-canvas:#111111;
 
-  /* ── Per-product accent identity (HashiCorp palette) ── */
-  --terraform:#844FBA; --terraform-bright:#9C6FD6;
-  --vault:#FFEC6E;
-  --consul:#DC477D;
-  --waypoint:#14C6CB; --waypoint-deep:#00A3A4;
-  --vagrant:#2E71E5;
-  --nomad:#00CA8E;
-  --boundary:#F24C53;
-  --accent-blue:#5990FF;
+  /* ── Per-product accent identity (adjusted for light theme) ── */
+  --terraform:#7C3AED; --terraform-bright:#9C6FD6;
+  --vault:#D97706;
+  --consul:#DB2777;
+  --waypoint:#0D9488; --waypoint-deep:#0F766E;
+  --vagrant:#2563EB;
+  --nomad:#059669;
+  --boundary:#DC2626;
+  --accent-blue:#3B82F6;
 
   /* Default accent (modules override --teal in their page scope) */
   --accent:var(--waypoint);
-  --teal:#14C6CB; --teal-light:#5BE3E8; --teal-deep:#00A3A4; --teal-glow:rgba(20,198,203,0.0);
-  --gold:#FFEC6E; --gold-light:#FFF3A0;
-  --red:#F24C53; --green:#00CA8E; --blue:#2E71E5; --purple:#844FBA; --orange:#F24C53;
+  --teal:#0D9488; --teal-light:#5BE3E8; --teal-deep:#0F766E; --teal-glow:rgba(13,148,136,0.0);
+  --gold:#D97706; --gold-light:#F59E0B;
+  --red:#DC2626; --green:#059669; --blue:#2563EB; --purple:#7C3AED; --orange:#EA580C;
 
   /* ── Text: ink / ink-muted / ink-subtle ── */
-  --text:#FFFFFF; --text-muted:#B2B6BD; --text-dim:#656A76;
-  --ink:#FFFFFF; --ink-muted:#B2B6BD; --ink-subtle:#656A76; --inverse-ink:#0A0A0A;
+  --text:#111111; --text-muted:#6B7280; --text-dim:#9CA3AF;
+  --ink:#111111; --ink-muted:#6B7280; --ink-subtle:#9CA3AF; --inverse-ink:#FFFFFF;
 
-  /* ── Effects: surface lift, not shadow ── */
-  --shadow-sm:none; --shadow-md:none; --shadow-lg:0 16px 48px rgba(0,0,0,0.5); --shadow-glow:none;
+  /* ── Effects: soft elevation shadows for light theme ── */
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 4px 12px rgba(0,0,0,0.06); --shadow-lg:0 12px 32px rgba(0,0,0,0.08); --shadow-glow:none;
   /* Radius scale (HashiCorp) */
   --radius:12px; --radius-sm:8px; --radius-lg:12px; --radius-xl:16px; --radius-xxl:24px;
   --rounded-md:8px; --rounded-lg:12px;
@@ -99,8 +99,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 h1,h2,h3,h4,.logo-name,.kpi-val,.card-title,.mo-title,.pg-title{font-family:var(--font-display);}
 ::-webkit-scrollbar{width:10px;height:10px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:6px;border:2px solid var(--bg);}
-::-webkit-scrollbar-thumb:hover{background:var(--surface3);}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:6px;border:2px solid var(--bg);}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);}
 ::selection{background:rgba(255,255,255,0.18);color:#fff;}
 
 /* LOGIN SCREEN */
@@ -122,7 +122,7 @@ h1,h2,h3,h4,.logo-name,.kpi-val,.card-title,.mo-title,.pg-title{font-family:var(
 .login-box{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:42px;width:100%;max-width:400px;position:relative;z-index:1;box-shadow:var(--shadow-lg);overflow:hidden;}
 .login-logo{text-align:center;margin-bottom:30px;position:relative;z-index:3;}
 .login-light-sweep{position:absolute;top:-60%;left:-80%;width:55%;height:220%;background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,0.04) 45%,rgba(255,255,255,0.12) 50%,rgba(255,255,255,0.04) 55%,transparent 100%);transform:rotate(8deg);pointer-events:none;z-index:2;opacity:0;}
-.login-badge{width:64px;height:64px;background:var(--inverse-canvas);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;color:var(--inverse-ink);margin-bottom:18px;letter-spacing:-1px;position:relative;}
+.login-badge{width:64px;height:64px;background:#111111;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;color:#FFFFFF;margin-bottom:18px;letter-spacing:-1px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,0.12);}
 .login-badge::after{content:'';position:absolute;inset:-8px;border-radius:22px;background:rgba(255,255,255,0.5);filter:blur(22px);opacity:0;z-index:-1;transition:opacity 0.4s;}
 .login-title{font-size:28px;font-weight:700;font-family:var(--font-display);color:var(--ink);margin-bottom:6px;letter-spacing:-0.6px;}
 .login-sub{font-size:13px;color:var(--ink-muted);font-weight:500;}
@@ -146,9 +146,9 @@ h1,h2,h3,h4,.logo-name,.kpi-val,.card-title,.mo-title,.pg-title{font-family:var(
 .app.show{display:block;}
 
 /* NAV */
-.topnav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--canvas);border-bottom:1px solid var(--hairline);display:flex;align-items:center;padding:0 24px;height:64px;gap:8px;}
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--hairline);display:flex;align-items:center;padding:0 24px;height:64px;gap:8px;}
 .logo{display:flex;align-items:center;gap:11px;margin-right:20px;}
-.logo-badge-sm{width:34px;height:34px;background:var(--inverse-canvas);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--inverse-ink);letter-spacing:-0.5px;}
+.logo-badge-sm{width:34px;height:34px;background:#111111;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#FFFFFF;letter-spacing:-0.5px;box-shadow:0 2px 6px rgba(0,0,0,0.08);}
 .logo-name{font-weight:700;font-size:15px;color:var(--ink);letter-spacing:-0.3px;}
 .logo-ver{font-size:9px;color:var(--ink-subtle);font-family:var(--font-mono);letter-spacing:0.5px;}
 .nav-tabs{display:flex;gap:2px;flex-wrap:wrap;}
@@ -214,8 +214,8 @@ h1,h2,h3,h4,.logo-name,.kpi-val,.card-title,.mo-title,.pg-title{font-family:var(
 
 /* KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:32px;}
-.kpi{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:24px;position:relative;overflow:hidden;transition:border-color 0.18s ease,background 0.18s ease;}
-.kpi:hover{border-color:rgba(178,182,189,0.22);background:var(--surface-2);}
+.kpi{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:24px;position:relative;overflow:hidden;transition:border-color 0.18s ease,background 0.18s ease,box-shadow 0.25s ease,transform 0.25s ease;box-shadow:var(--shadow-sm);}
+.kpi:hover{border-color:rgba(0,0,0,0.15);background:var(--surface-1);box-shadow:var(--shadow-md);transform:translateY(-2px);}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--accent));}
 .kpi-label{font-size:12px;color:var(--ink-subtle);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-family:var(--font-body);font-weight:600;}
 .kpi-val{font-size:28px;font-weight:700;line-height:1.17;font-family:var(--font-display);letter-spacing:-1px;}
@@ -229,8 +229,8 @@ h1,h2,h3,h4,.logo-name,.kpi-val,.card-title,.mo-title,.pg-title{font-family:var(
 @media(max-width:768px){.g3{grid-template-columns:1fr;}}
 
 /* CARD */
-.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;transition:border-color 0.18s ease;}
-.card:hover{border-color:rgba(178,182,189,0.16);}
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;transition:border-color 0.18s ease,box-shadow 0.25s ease;box-shadow:var(--shadow-sm);}
+.card:hover{border-color:rgba(0,0,0,0.12);box-shadow:var(--shadow-md);}
 .card-h{padding:18px 24px;border-bottom:1px solid var(--hairline-soft);display:flex;align-items:center;justify-content:space-between;}
 .card-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:9px;letter-spacing:-0.3px;}
 .card-b{padding:24px;}
@@ -263,10 +263,10 @@ tr:hover td{background:rgba(178,182,189,0.04);}
 
 /* BTN */
 .btn{padding:10px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s ease;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
-.btn-primary{background:var(--inverse-canvas);color:var(--inverse-ink);}
-.btn-primary:hover{background:#E6E6E6;}
+.btn-primary{background:#111111;color:#FFFFFF;}
+.btn-primary:hover{background:#000000;}
 .btn-ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--hairline);}
-.btn-ghost:hover{background:var(--surface-3);border-color:rgba(178,182,189,0.2);}
+.btn-ghost:hover{background:var(--surface-3);border-color:rgba(0,0,0,0.15);}
 .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
 .btn-danger{background:rgba(242,76,83,.12);color:var(--boundary);border:1px solid rgba(242,76,83,.3);}
 .btn-danger:hover{background:rgba(242,76,83,.2);}
