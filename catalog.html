@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -62,51 +64,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .hero-chips{display:flex;flex-wrap:wrap;gap:8px}
 .hero-chip{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:500;color:var(--text2)}
 .hero-chip svg{width:16px;height:16px;flex-shrink:0}
-.hero-deco{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:340px;height:340px;border-radius:50%;background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(37,99,235,.04));pointer-events:none;animation:floatDeco 6s ease-in-out infinite}
-@keyframes floatDeco{0%,100%{transform:translateY(-50%) translate(0,0)}50%{transform:translateY(-50%) translate(-10px,-15px)}}
+.hero-deco{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:340px;height:340px;border-radius:50%;background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(37,99,235,.04));pointer-events:none}
 @media(max-width:640px){.hero-deco{display:none}}
 
-/* ══════ HERO ANIMATIONS ══════ */
-.hero-label,.hero-title,.hero-desc,.hero-chips{opacity:0;transform:translateY(20px);animation:heroIn .7s cubic-bezier(.16,1,.3,1) forwards}
-.hero-label{animation-delay:.1s}
-.hero-title{animation-delay:.2s}
-.hero-desc{animation-delay:.35s}
-.hero-chips{animation-delay:.5s}
-@keyframes heroIn{to{opacity:1;transform:none}}
-
-.hero-chip{opacity:0;animation:chipIn .5s cubic-bezier(.16,1,.3,1) forwards}
-.hero-chip:nth-child(1){animation-delay:.55s}
-.hero-chip:nth-child(2){animation-delay:.65s}
-.hero-chip:nth-child(3){animation-delay:.75s}
-@keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:none}}
-
-/* ══════ STATS ANIMATIONS ══════ */
-.stat-item{opacity:0;transform:translateY(15px);animation:statIn .6s cubic-bezier(.16,1,.3,1) forwards}
-.stat-item:nth-child(1){animation-delay:.3s}
-.stat-item:nth-child(2){animation-delay:.45s}
-.stat-item:nth-child(3){animation-delay:.6s}
-@keyframes statIn{to{opacity:1;transform:none}}
-
-/* ══════ SCROLL REVEAL ══════ */
-.pcard{opacity:0;transform:translateY(24px) scale(.97)}
-.pcard.revealed{animation:cardReveal .55s cubic-bezier(.16,1,.3,1) forwards}
-@keyframes cardReveal{to{opacity:1;transform:none}}
+/* ══════ GSAP INITIAL STATES ══════ */
+.hero-label,.hero-title,.hero-desc,.hero-chips{opacity:0}
+.stat-item{opacity:0}
+.section-head{opacity:0}
 
 /* ══════ NAVBAR SCROLL EFFECT ══════ */
 .navbar{transition:box-shadow .3s,background .3s}
-.navbar.scrolled{box-shadow:0 1px 8px rgba(0,0,0,.06)}
-
-/* ══════ CART BADGE PULSE ══════ */
-.nav-cart-badge.pulse{animation:badgePulse .4s ease}
-@keyframes badgePulse{0%{transform:scale(1)}50%{transform:scale(1.35)}100%{transform:scale(1)}}
+.navbar.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.06);background:rgba(255,255,255,.95)}
 
 /* ══════ FILTER ACTIVE TRANSITION ══════ */
 .filter-btn{transition:all .25s cubic-bezier(.16,1,.3,1)}
-.filter-btn:active{transform:scale(.94)}
-
-/* ══════ PRODUCT GRID TRANSITION ══════ */
-.product-grid{transition:opacity .15s}
-.product-grid.switching{opacity:.4}
+.filter-btn:active{transform:scale(.92)}
 
 /* ══════ STATS ══════ */
 .stats{background:var(--white);border-bottom:1px solid var(--border)}
@@ -135,14 +107,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 @media(min-width:820px){.product-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1080px){.product-grid{grid-template-columns:repeat(5,1fr)}}
 
-.pcard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s;position:relative}
-.pcard:hover{box-shadow:var(--shadow-md);border-color:var(--border2);transform:translateY(-4px)}
-.pcard:active{transform:scale(.97)}
-.pcard.in-cart{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.pcard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .3s;position:relative;opacity:0;transform:translateY(30px)}
+.pcard:hover{box-shadow:var(--shadow-lg);border-color:var(--border2);transform:translateY(-6px) scale(1.02)}
+.pcard:active{transform:scale(.96)}
+.pcard.in-cart{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal)}
 
 .pcard-img{aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.pcard-img img{width:80%;height:80%;object-fit:contain;transition:transform .4s cubic-bezier(.16,1,.3,1)}
-.pcard:hover .pcard-img img{transform:scale(1.08)}
+.pcard-img img{width:80%;height:80%;object-fit:contain;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.pcard:hover .pcard-img img{transform:scale(1.1) rotate(2deg)}
 .pcard-img .emoji-placeholder{font-size:48px}
 
 .brand-pill{position:absolute;top:10px;left:10px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:100px;letter-spacing:.3px;text-transform:uppercase}
@@ -158,10 +130,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .pcard-name{font-size:13px;font-weight:600;line-height:1.35;color:var(--text);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pcard-price{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;letter-spacing:-.3px}
 .pcard-price.no-price{font-size:12px;color:var(--muted);font-weight:500}
-.pcard-add{width:100%;padding:9px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);border-radius:10px;transition:all .2s}
-.pcard-add:hover{background:var(--text);color:var(--white);border-color:var(--text)}
+.pcard-add{width:100%;padding:9px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);border-radius:10px;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.pcard-add:hover{background:var(--text);color:var(--white);border-color:var(--text);transform:scale(1.04)}
+.pcard-add:active{transform:scale(.95)}
 .pcard-add.added{background:var(--teal);border-color:var(--teal);color:var(--white)}
-.pcard-add:disabled{background:var(--red-light);border-color:rgba(220,38,38,.12);color:var(--red);cursor:not-allowed}
+.pcard-add:disabled{background:var(--red-light);border-color:rgba(220,38,38,.12);color:var(--red);cursor:not-allowed;transform:none}
 
 /* ══════ CART FAB (Mobile) ══════ */
 .cart-fab{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);z-index:150;display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--text);color:var(--white);padding:14px 22px;border-radius:var(--radius-lg);font-weight:600;font-size:14px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;white-space:nowrap;min-width:260px;border:none;font-family:var(--font);opacity:0;box-shadow:var(--shadow-xl)}
@@ -612,89 +585,142 @@ function closeVideo(){document.getElementById('videoOv').classList.remove('open'
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);}
 
-// Scroll reveal for product cards
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
-      const card = entry.target;
-      const idx = Array.from(card.parentNode.children).indexOf(card);
-      const col = window.innerWidth < 520 ? 2 : window.innerWidth < 820 ? 3 : window.innerWidth < 1080 ? 4 : 5;
-      const row = Math.floor(idx / col);
-      const colIdx = idx % col;
-      card.style.animationDelay = (colIdx * 0.06 + row * 0.02) + 's';
-      card.classList.add('revealed');
-      revealObserver.unobserve(card);
-    }
-  });
-}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+gsap.registerPlugin(ScrollTrigger);
 
-function observeCards() {
-  document.querySelectorAll('.pcard:not(.revealed)').forEach(c => revealObserver.observe(c));
-}
+// ══════ GSAP: Hero entrance timeline ══════
+const heroTL = gsap.timeline({ delay: 0.2 });
+heroTL
+  .from('.hero-deco', { scale: 0, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' })
+  .to('.hero-label', { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)' }, '-=0.8')
+  .to('.hero-title', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4')
+  .to('.hero-desc', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.4')
+  .to('.hero-chips', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+  .from('.hero-chip', { opacity: 0, y: 15, scale: 0.9, stagger: 0.1, duration: 0.5, ease: 'back.out(1.7)' }, '-=0.3');
 
-// Counter animation for stats
-function animateCounter(el, target) {
-  const duration = 1200;
-  const start = performance.now();
-  const initial = 0;
-  function tick(now) {
-    const t = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - t, 4);
-    el.textContent = Math.round(initial + (target - initial) * ease);
-    if (t < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
+gsap.set(['.hero-label','.hero-title','.hero-desc','.hero-chips'], { y: 25 });
 
-const statsObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const nums = entry.target.querySelectorAll('.stat-num');
-      nums.forEach(n => {
-        const val = parseInt(n.textContent);
-        if (!isNaN(val)) animateCounter(n, val);
+// ══════ GSAP: Hero deco floating ══════
+gsap.to('.hero-deco', {
+  y: -20, x: -10, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1
+});
+
+// ══════ GSAP: Stats counter + reveal ══════
+gsap.to('.stat-item', {
+  opacity: 1, y: 0, stagger: 0.12, duration: 0.7, ease: 'back.out(1.4)',
+  scrollTrigger: { trigger: '.stats', start: 'top 85%' },
+  onStart: function() {
+    document.querySelectorAll('.stat-num').forEach(el => {
+      const target = parseInt(el.textContent);
+      if (isNaN(target)) return;
+      gsap.from(el, {
+        textContent: 0, duration: 1.5, ease: 'power2.out', snap: { textContent: 1 },
+        onUpdate: function() { el.textContent = Math.round(parseFloat(el.textContent)); }
       });
-      statsObserver.unobserve(entry.target);
-    }
+    });
+  }
+});
+gsap.set('.stat-item', { y: 20 });
+
+// ══════ GSAP: Section header ══════
+gsap.to('.section-head', {
+  opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
+  scrollTrigger: { trigger: '.section-head', start: 'top 90%' }
+});
+gsap.set('.section-head', { y: 15 });
+
+// ══════ GSAP: Navbar scroll ══════
+ScrollTrigger.create({
+  start: 10,
+  onUpdate: (self) => {
+    document.querySelector('.navbar').classList.toggle('scrolled', self.scroll() > 10);
+  }
+});
+
+// ══════ GSAP: Product card scroll reveal ══════
+function animateCards() {
+  const cards = document.querySelectorAll('.pcard');
+  if (!cards.length) return;
+  const cols = window.innerWidth < 520 ? 2 : window.innerWidth < 820 ? 3 : window.innerWidth < 1080 ? 4 : 5;
+
+  ScrollTrigger.batch(cards, {
+    onEnter: (batch) => {
+      batch.forEach((card, i) => {
+        const idx = Array.from(card.parentNode.children).indexOf(card);
+        const colIdx = idx % cols;
+        gsap.to(card, {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.6,
+          delay: colIdx * 0.08,
+          ease: 'back.out(1.4)',
+          overwrite: true
+        });
+      });
+    },
+    start: 'top 92%'
   });
-}, { threshold: 0.5 });
-statsObserver.observe(document.querySelector('.stats-inner'));
+}
 
-// Navbar scroll effect
-let lastScroll = 0;
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('.navbar');
-  if (window.scrollY > 10) nav.classList.add('scrolled');
-  else nav.classList.remove('scrolled');
-  lastScroll = window.scrollY;
-}, { passive: true });
-
-// Override render to trigger scroll reveal after DOM update
+// ══════ GSAP: Override render ══════
 const _origRender = render;
 render = function() {
   _origRender();
-  requestAnimationFrame(() => observeCards());
+  requestAnimationFrame(() => {
+    ScrollTrigger.refresh();
+    animateCards();
+  });
 };
 
-// Pulse badge on add
+// ══════ GSAP: Cart badge bounce ══════
 const _origUpdateFab = updateFab;
 updateFab = function() {
   _origUpdateFab();
   const badge = document.getElementById('navBadge');
-  badge.classList.remove('pulse');
-  void badge.offsetWidth;
-  badge.classList.add('pulse');
+  gsap.fromTo(badge, { scale: 1.5 }, { scale: 1, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+  const fab = document.getElementById('cartFab');
+  if (fab.classList.contains('show')) {
+    gsap.fromTo(fab, { scale: 0.95 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.5)' });
+  }
 };
 
-// Category switch with fade
+// ══════ GSAP: Category filter transition ══════
 const _origSetCat = setCat;
 setCat = function(cat, btn) {
   const grid = document.getElementById('productGrid');
-  grid.classList.add('switching');
-  setTimeout(() => {
-    _origSetCat(cat, btn);
-    grid.classList.remove('switching');
-  }, 150);
+  gsap.to(grid, {
+    opacity: 0, y: 10, duration: 0.2, ease: 'power2.in',
+    onComplete: () => {
+      _origSetCat(cat, btn);
+      gsap.fromTo(grid, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+    }
+  });
+};
+
+// ══════ GSAP: Toast animation ══════
+const _origToast = showToast;
+showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  gsap.killTweensOf(t);
+  gsap.fromTo(t,
+    { opacity: 0, y: 20, scale: 0.9 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)',
+      onComplete: () => {
+        gsap.to(t, { opacity: 0, y: -10, delay: 2, duration: 0.3, ease: 'power2.in' });
+      }
+    }
+  );
+};
+
+// ══════ GSAP: Modal open/close ══════
+const _origOpenOverlay = openOverlay;
+openOverlay = function(id) {
+  const overlay = document.getElementById(id);
+  const sheet = overlay.querySelector('.sheet');
+  overlay.classList.add('open');
+  gsap.fromTo(sheet,
+    { y: '100%', scale: 0.95 },
+    { y: '0%', scale: 1, duration: 0.5, ease: 'power3.out' }
+  );
 };
 
 init();
