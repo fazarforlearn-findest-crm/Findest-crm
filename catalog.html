@@ -62,8 +62,51 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .hero-chips{display:flex;flex-wrap:wrap;gap:8px}
 .hero-chip{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:500;color:var(--text2)}
 .hero-chip svg{width:16px;height:16px;flex-shrink:0}
-.hero-deco{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:340px;height:340px;border-radius:50%;background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(37,99,235,.04));pointer-events:none}
+.hero-deco{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:340px;height:340px;border-radius:50%;background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(37,99,235,.04));pointer-events:none;animation:floatDeco 6s ease-in-out infinite}
+@keyframes floatDeco{0%,100%{transform:translateY(-50%) translate(0,0)}50%{transform:translateY(-50%) translate(-10px,-15px)}}
 @media(max-width:640px){.hero-deco{display:none}}
+
+/* ══════ HERO ANIMATIONS ══════ */
+.hero-label,.hero-title,.hero-desc,.hero-chips{opacity:0;transform:translateY(20px);animation:heroIn .7s cubic-bezier(.16,1,.3,1) forwards}
+.hero-label{animation-delay:.1s}
+.hero-title{animation-delay:.2s}
+.hero-desc{animation-delay:.35s}
+.hero-chips{animation-delay:.5s}
+@keyframes heroIn{to{opacity:1;transform:none}}
+
+.hero-chip{opacity:0;animation:chipIn .5s cubic-bezier(.16,1,.3,1) forwards}
+.hero-chip:nth-child(1){animation-delay:.55s}
+.hero-chip:nth-child(2){animation-delay:.65s}
+.hero-chip:nth-child(3){animation-delay:.75s}
+@keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:none}}
+
+/* ══════ STATS ANIMATIONS ══════ */
+.stat-item{opacity:0;transform:translateY(15px);animation:statIn .6s cubic-bezier(.16,1,.3,1) forwards}
+.stat-item:nth-child(1){animation-delay:.3s}
+.stat-item:nth-child(2){animation-delay:.45s}
+.stat-item:nth-child(3){animation-delay:.6s}
+@keyframes statIn{to{opacity:1;transform:none}}
+
+/* ══════ SCROLL REVEAL ══════ */
+.pcard{opacity:0;transform:translateY(24px) scale(.97)}
+.pcard.revealed{animation:cardReveal .55s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes cardReveal{to{opacity:1;transform:none}}
+
+/* ══════ NAVBAR SCROLL EFFECT ══════ */
+.navbar{transition:box-shadow .3s,background .3s}
+.navbar.scrolled{box-shadow:0 1px 8px rgba(0,0,0,.06)}
+
+/* ══════ CART BADGE PULSE ══════ */
+.nav-cart-badge.pulse{animation:badgePulse .4s ease}
+@keyframes badgePulse{0%{transform:scale(1)}50%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+/* ══════ FILTER ACTIVE TRANSITION ══════ */
+.filter-btn{transition:all .25s cubic-bezier(.16,1,.3,1)}
+.filter-btn:active{transform:scale(.94)}
+
+/* ══════ PRODUCT GRID TRANSITION ══════ */
+.product-grid{transition:opacity .15s}
+.product-grid.switching{opacity:.4}
 
 /* ══════ STATS ══════ */
 .stats{background:var(--white);border-bottom:1px solid var(--border)}
@@ -92,16 +135,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 @media(min-width:820px){.product-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1080px){.product-grid{grid-template-columns:repeat(5,1fr)}}
 
-.pcard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .25s ease;position:relative;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) backwards}
-.pcard:hover{box-shadow:var(--shadow-md);border-color:var(--border2);transform:translateY(-3px)}
-.pcard:active{transform:scale(.98)}
+.pcard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s;position:relative}
+.pcard:hover{box-shadow:var(--shadow-md);border-color:var(--border2);transform:translateY(-4px)}
+.pcard:active{transform:scale(.97)}
 .pcard.in-cart{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.product-grid .pcard:nth-child(1){animation-delay:.02s}.product-grid .pcard:nth-child(2){animation-delay:.05s}.product-grid .pcard:nth-child(3){animation-delay:.08s}.product-grid .pcard:nth-child(4){animation-delay:.11s}.product-grid .pcard:nth-child(5){animation-delay:.14s}.product-grid .pcard:nth-child(6){animation-delay:.17s}.product-grid .pcard:nth-child(7){animation-delay:.2s}.product-grid .pcard:nth-child(8){animation-delay:.23s}.product-grid .pcard:nth-child(9){animation-delay:.26s}.product-grid .pcard:nth-child(10){animation-delay:.29s}
 
 .pcard-img{aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.pcard-img img{width:80%;height:80%;object-fit:contain;transition:transform .3s ease}
-.pcard:hover .pcard-img img{transform:scale(1.05)}
+.pcard-img img{width:80%;height:80%;object-fit:contain;transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.pcard:hover .pcard-img img{transform:scale(1.08)}
 .pcard-img .emoji-placeholder{font-size:48px}
 
 .brand-pill{position:absolute;top:10px;left:10px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:100px;letter-spacing:.3px;text-transform:uppercase}
@@ -570,6 +611,91 @@ function closeVideo(){document.getElementById('videoOv').classList.remove('open'
 
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);}
+
+// Scroll reveal for product cards
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      const card = entry.target;
+      const idx = Array.from(card.parentNode.children).indexOf(card);
+      const col = window.innerWidth < 520 ? 2 : window.innerWidth < 820 ? 3 : window.innerWidth < 1080 ? 4 : 5;
+      const row = Math.floor(idx / col);
+      const colIdx = idx % col;
+      card.style.animationDelay = (colIdx * 0.06 + row * 0.02) + 's';
+      card.classList.add('revealed');
+      revealObserver.unobserve(card);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+function observeCards() {
+  document.querySelectorAll('.pcard:not(.revealed)').forEach(c => revealObserver.observe(c));
+}
+
+// Counter animation for stats
+function animateCounter(el, target) {
+  const duration = 1200;
+  const start = performance.now();
+  const initial = 0;
+  function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 4);
+    el.textContent = Math.round(initial + (target - initial) * ease);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const nums = entry.target.querySelectorAll('.stat-num');
+      nums.forEach(n => {
+        const val = parseInt(n.textContent);
+        if (!isNaN(val)) animateCounter(n, val);
+      });
+      statsObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+statsObserver.observe(document.querySelector('.stats-inner'));
+
+// Navbar scroll effect
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('.navbar');
+  if (window.scrollY > 10) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+  lastScroll = window.scrollY;
+}, { passive: true });
+
+// Override render to trigger scroll reveal after DOM update
+const _origRender = render;
+render = function() {
+  _origRender();
+  requestAnimationFrame(() => observeCards());
+};
+
+// Pulse badge on add
+const _origUpdateFab = updateFab;
+updateFab = function() {
+  _origUpdateFab();
+  const badge = document.getElementById('navBadge');
+  badge.classList.remove('pulse');
+  void badge.offsetWidth;
+  badge.classList.add('pulse');
+};
+
+// Category switch with fade
+const _origSetCat = setCat;
+setCat = function(cat, btn) {
+  const grid = document.getElementById('productGrid');
+  grid.classList.add('switching');
+  setTimeout(() => {
+    _origSetCat(cat, btn);
+    grid.classList.remove('switching');
+  }, 150);
+};
 
 init();
 </script>
