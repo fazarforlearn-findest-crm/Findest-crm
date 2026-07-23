@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html, body {
+  background: theme("colors.canvas.DEFAULT");
+  color: theme("colors.ink.DEFAULT");
+  font-family: theme("fontFamily.sans");
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.dark html, .dark body, html.dark, body.dark {
+  background: theme("colors.canvas.dark");
+  color: #EDE7DA;
+}
+
+@layer components {
+  .heading-serif {
+    font-family: theme("fontFamily.serif");
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+  .surface-card {
+    background: white;
+    border-radius: 1.25rem;
+    box-shadow: theme("boxShadow.soft");
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .surface-card:hover {
+    transform: translateY(-2px);
+    box-shadow: theme("boxShadow.lift");
+  }
+  .dark .surface-card {
+    background: #24211D;
+  }
+}
